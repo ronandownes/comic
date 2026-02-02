@@ -328,19 +328,17 @@ def generate_index(strands, page_counts):
             overflow: auto;
             background: #e8e8e8;
             position: relative;
+            /* Allow scrolling when zoomed */
+            -webkit-overflow-scrolling: touch;
         }}
         .image-container img {{ 
             display: block; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
-            transition: transform 0.1s;
-            transform-origin: center center;
             background: #fff;
         }}
         .image-container.fit-height {{ align-items: center; }}
         .image-container.fit-height img {{ height: 100% !important; width: auto !important; max-width: none; object-fit: contain; }}
         .image-container.fit-width img {{ width: 100% !important; max-width: 900px; height: auto !important; object-fit: contain; }}
-        .image-container.panning {{ cursor: grab; }}
-        .image-container.panning:active {{ cursor: grabbing; }}
         
         .zoom-indicator {{
             position: absolute;
@@ -452,13 +450,7 @@ let currentTopic = 0;
 let currentPage = 1;
 let totalPages = 1;
 let zoom = 1.0;
-let translateX = 0;
-let translateY = 0;
 let fitMode = localStorage.getItem('fitMode') || 'height';
-let isPanning = false;
-let spaceHeld = false;
-let startX = 0, startY = 0;
-let panStartX = 0, panStartY = 0;
 
 const $ = id => document.getElementById(id);
 
@@ -501,29 +493,52 @@ function loadPage(p) {{
     $('prevBtn').disabled = currentPage <= 1;
     $('nextBtn').disabled = currentPage >= totalPages;
     history.replaceState(null, '', '?t=' + currentTopic + '&p=' + currentPage);
-    zoom = 1; translateX = 0; translateY = 0;
-    updateTransform();
+    resetZoom();
     $('imageContainer').scrollTop = 0;
+    $('imageContainer').scrollLeft = 0;
 }}
 
-function updateTransform() {{
-    $('pageImage').style.transform = `translate(${{translateX}}px,${{translateY}}px) scale(${{zoom}})`;
+function updateZoom() {{
+    const img = $('pageImage');
+    const container = $('imageContainer');
+    
+    // Remove fit classes temporarily for manual zoom
+    if (zoom !== 1) {{
+        container.classList.remove('fit-height', 'fit-width');
+        // Set actual dimensions based on zoom
+        img.style.width = (zoom * 100) + '%';
+        img.style.height = 'auto';
+        img.style.maxWidth = 'none';
+    }} else {{
+        // Reset to fit mode
+        img.style.width = '';
+        img.style.height = '';
+        img.style.maxWidth = '';
+        container.classList.add('fit-' + fitMode);
+    }}
+    
     $('zoomIndicator').textContent = Math.round(zoom * 100) + '%';
     $('zoomIndicator').style.display = zoom !== 1 ? 'block' : 'none';
 }}
 
-function zoomIn() {{ zoom = Math.min(5, zoom + 0.15); updateTransform(); }}
-function zoomOut() {{ zoom = Math.max(0.2, zoom - 0.15); updateTransform(); }}
-function resetZoom() {{ zoom = 1; translateX = 0; translateY = 0; updateTransform(); }}
+function zoomIn() {{ zoom = Math.min(3, zoom + 0.25); updateZoom(); }}
+function zoomOut() {{ zoom = Math.max(0.5, zoom - 0.25); updateZoom(); }}
+function resetZoom() {{ zoom = 1; updateZoom(); }}
 
 function setFitMode(mode) {{
     fitMode = mode;
+    zoom = 1; // Reset zoom when changing fit mode
+    const img = $('pageImage');
+    img.style.width = '';
+    img.style.height = '';
+    img.style.maxWidth = '';
+    
     const c = $('imageContainer');
     c.classList.remove('fit-height', 'fit-width');
     c.classList.add('fit-' + mode);
     $('fitHeight').classList.toggle('active', mode === 'height');
     $('fitWidth').classList.toggle('active', mode === 'width');
-    resetZoom();
+    $('zoomIndicator').style.display = 'none';
     localStorage.setItem('fitMode', mode);
 }}
 
@@ -538,86 +553,71 @@ document.addEventListener('keydown', e => {{
     if (e.key === '+' || e.key === '=') {{ zoomIn(); e.preventDefault(); }}
     if (e.key === '-') {{ zoomOut(); e.preventDefault(); }}
     if (e.key === '0') {{ resetZoom(); e.preventDefault(); }}
-    if (e.code === 'Space' && !spaceHeld) {{
-        spaceHeld = true;
-        $('imageContainer').classList.add('panning');
-        e.preventDefault();
-    }}
 }});
 
-document.addEventListener('keyup', e => {{
-    if (e.code === 'Space') {{
-        spaceHeld = false;
-        isPanning = false;
-        $('imageContainer').classList.remove('panning');
-    }}
-}});
-
-// Ctrl+scroll zoom
-document.addEventListener('wheel', e => {{
+// Mouse wheel: Ctrl/Cmd+scroll = zoom, normal scroll = scroll page
+const container = $('imageContainer');
+container.addEventListener('wheel', e => {{
+    // Ctrl+scroll OR Cmd+scroll (Mac) = zoom
     if (e.ctrlKey || e.metaKey) {{
         e.preventDefault();
-        zoom = Math.max(0.2, Math.min(5, zoom + (e.deltaY > 0 ? -0.1 : 0.1)));
-        updateTransform();
+        const delta = e.deltaY > 0 ? -0.15 : 0.15;
+        zoom = Math.max(0.5, Math.min(3, zoom + delta));
+        updateZoom();
     }}
+    // Normal scroll = let browser handle it (scrolls the container)
 }}, {{ passive: false }});
 
-// Drag pan
-$('imageContainer').addEventListener('mousedown', e => {{
-    if (spaceHeld) {{
-        isPanning = true;
-        startX = e.clientX; startY = e.clientY;
-        panStartX = translateX; panStartY = translateY;
-        e.preventDefault();
-    }}
+// Trackpad pinch zoom (fires as wheel with ctrlKey on most browsers)
+// Already handled above
+
+// Double-click to reset zoom
+$('pageImage').addEventListener('dblclick', e => {{
+    e.preventDefault();
+    resetZoom();
 }});
-window.addEventListener('mousemove', e => {{
-    if (!isPanning) return;
-    translateX = panStartX + e.clientX - startX;
-    translateY = panStartY + e.clientY - startY;
-    updateTransform();
-}});
-window.addEventListener('mouseup', () => isPanning = false);
 
-// Double-click reset
-$('pageImage').addEventListener('dblclick', resetZoom);
+// Touch: pinch zoom + swipe navigation
+let touch = {{ startX: 0, startY: 0, startDist: 0, startZoom: 1, isPinch: false }};
 
-// Touch
-let touchX = 0, touchY = 0, touchDist = 0, touchZoom = 1, touchPan = false;
-
-$('imageContainer').addEventListener('touchstart', e => {{
-    touchX = e.touches[0].clientX;
-    touchY = e.touches[0].clientY;
-    if (e.touches.length === 1 && zoom > 1) {{
-        touchPan = true;
+container.addEventListener('touchstart', e => {{
+    if (e.touches.length === 1) {{
+        touch.startX = e.touches[0].clientX;
+        touch.startY = e.touches[0].clientY;
+        touch.isPinch = false;
     }} else if (e.touches.length === 2) {{
-        touchPan = false;
-        touchDist = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
-        touchZoom = zoom;
+        touch.isPinch = true;
+        touch.startDist = Math.hypot(
+            e.touches[1].clientX - e.touches[0].clientX,
+            e.touches[1].clientY - e.touches[0].clientY
+        );
+        touch.startZoom = zoom;
     }}
 }}, {{ passive: true }});
 
-$('imageContainer').addEventListener('touchmove', e => {{
-    if (e.touches.length === 1 && touchPan && zoom > 1) {{
-        translateX += e.touches[0].clientX - touchX;
-        translateY += e.touches[0].clientY - touchY;
-        touchX = e.touches[0].clientX;
-        touchY = e.touches[0].clientY;
-        updateTransform();
-    }} else if (e.touches.length === 2) {{
-        const d = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
-        zoom = Math.max(0.2, Math.min(5, touchZoom * (d / touchDist)));
-        updateTransform();
+container.addEventListener('touchmove', e => {{
+    if (e.touches.length === 2 && touch.isPinch) {{
+        const dist = Math.hypot(
+            e.touches[1].clientX - e.touches[0].clientX,
+            e.touches[1].clientY - e.touches[0].clientY
+        );
+        zoom = Math.max(0.5, Math.min(3, touch.startZoom * (dist / touch.startDist)));
+        updateZoom();
     }}
 }}, {{ passive: true }});
 
-$('imageContainer').addEventListener('touchend', e => {{
-    if (e.touches.length === 0 && !touchPan && zoom <= 1.1) {{
-        const diff = e.changedTouches[0].clientX - touchX;
-        if (Math.abs(diff) > 50) diff > 0 ? loadPage(currentPage - 1) : loadPage(currentPage + 1);
+container.addEventListener('touchend', e => {{
+    if (e.touches.length === 0 && !touch.isPinch) {{
+        const diffX = e.changedTouches[0].clientX - touch.startX;
+        const diffY = e.changedTouches[0].clientY - touch.startY;
+        // Horizontal swipe > vertical = page navigation
+        if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {{
+            if (diffX > 0) loadPage(currentPage - 1);
+            else loadPage(currentPage + 1);
+        }}
     }}
-    touchPan = false;
-}});
+    touch.isPinch = false;
+}}, {{ passive: true }});
 
 // Init
 window.onload = () => {{
