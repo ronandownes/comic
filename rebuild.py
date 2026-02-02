@@ -187,11 +187,12 @@ def generate_index(strands, page_counts):
     <!-- ============ END TRACKING ============ -->
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        html {{ height: 100%; }}
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f5f5f5;
             color: #333;
-            height: 100vh;
+            height: 100%;
             overflow: hidden;
             display: flex;
         }}
@@ -283,7 +284,7 @@ def generate_index(strands, page_counts):
         .topic.active .topic-title {{ color: #1e88e5; }}
         
         /* Main Viewer */
-        .viewer {{ flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; }}
+        .viewer {{ flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; min-height: 0; }}
         
         /* Controls Bar */
         .controls {{
@@ -295,6 +296,7 @@ def generate_index(strands, page_counts):
             border-bottom: 1px solid #eee;
             gap: 6px;
             min-height: 36px;
+            flex-shrink: 0;
         }}
         
         .topic-name {{ font-size: 12px; color: #333; margin-right: auto; }}
@@ -316,8 +318,20 @@ def generate_index(strands, page_counts):
         button:disabled {{ opacity: 0.4; cursor: default; }}
         
         .sep {{ width: 1px; height: 16px; background: #ddd; }}
-        .page-info {{ font-size: 11px; color: #888; }}
+        .page-info {{ font-size: 11px; color: #888; display: flex; align-items: center; gap: 2px; }}
         .page-info span {{ color: #333; }}
+        .page-input {{
+            width: 32px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 11px;
+            padding: 2px 4px;
+            color: #333;
+            background: #fff;
+        }}
+        .page-input:focus {{ outline: none; border-color: #1e88e5; }}
+        .page-input::-webkit-inner-spin-button {{ -webkit-appearance: none; }}
         
         /* Image Container */
         .image-container {{
@@ -328,7 +342,7 @@ def generate_index(strands, page_counts):
             overflow: auto;
             background: #e8e8e8;
             position: relative;
-            /* Allow scrolling when zoomed */
+            min-height: 0; /* Critical for flex height to work */
             -webkit-overflow-scrolling: touch;
         }}
         .image-container img {{ 
@@ -336,9 +350,22 @@ def generate_index(strands, page_counts):
             box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
             background: #fff;
         }}
-        .image-container.fit-height {{ align-items: center; }}
-        .image-container.fit-height img {{ height: 100% !important; width: auto !important; max-width: none; object-fit: contain; }}
-        .image-container.fit-width img {{ width: 100% !important; max-width: 900px; height: auto !important; object-fit: contain; }}
+        .image-container.fit-height {{ 
+            align-items: center;
+            overflow: hidden; /* No scroll when fit */
+        }}
+        .image-container.fit-height img {{ 
+            max-height: 100%;
+            max-width: 100%;
+            width: auto; 
+            height: auto;
+            object-fit: contain;
+        }}
+        .image-container.fit-width img {{ 
+            width: 100%; 
+            max-width: 900px; 
+            height: auto;
+        }}
         
         .zoom-indicator {{
             position: absolute;
@@ -430,7 +457,7 @@ def generate_index(strands, page_counts):
             <button onclick="zoomOut()" title="Zoom Out (-)">−</button>
             <button onclick="zoomIn()" title="Zoom In (+)">+</button>
             <div class="sep"></div>
-            <div class="page-info"><span id="pageNum">1</span> / <span id="totalPages">1</span></div>
+            <div class="page-info"><input type="number" id="pageNum" class="page-input" value="1" min="1"> / <span id="totalPages">1</span></div>
         </div>
         <div class="image-container" id="imageContainer">
             <img id="pageImage" src="" alt="">
@@ -475,6 +502,7 @@ function openTopic(t) {{
     $('nextBtn').style.display = 'flex';
     $('topicName').innerHTML = '<strong>' + t + '.</strong> ' + topics[t].title;
     $('totalPages').textContent = totalPages;
+    $('pageNum').max = totalPages;
     
     document.querySelectorAll('.topic').forEach(el => {{
         el.classList.toggle('active', parseInt(el.dataset.t) === t);
@@ -489,7 +517,7 @@ function loadPage(p) {{
     currentPage = p;
     const img = IMG_PREFIX + String(currentTopic).padStart(2,'0') + String(currentPage).padStart(2,'0') + '.webp';
     $('pageImage').src = img;
-    $('pageNum').textContent = currentPage;
+    $('pageNum').value = currentPage;
     $('prevBtn').disabled = currentPage <= 1;
     $('nextBtn').disabled = currentPage >= totalPages;
     history.replaceState(null, '', '?t=' + currentTopic + '&p=' + currentPage);
@@ -505,15 +533,19 @@ function updateZoom() {{
     // Remove fit classes temporarily for manual zoom
     if (zoom !== 1) {{
         container.classList.remove('fit-height', 'fit-width');
+        container.style.overflow = 'auto'; // Allow scroll when zoomed
         // Set actual dimensions based on zoom
         img.style.width = (zoom * 100) + '%';
         img.style.height = 'auto';
         img.style.maxWidth = 'none';
+        img.style.maxHeight = 'none';
     }} else {{
         // Reset to fit mode
         img.style.width = '';
         img.style.height = '';
         img.style.maxWidth = '';
+        img.style.maxHeight = '';
+        container.style.overflow = '';
         container.classList.add('fit-' + fitMode);
     }}
     
@@ -532,8 +564,10 @@ function setFitMode(mode) {{
     img.style.width = '';
     img.style.height = '';
     img.style.maxWidth = '';
+    img.style.maxHeight = '';
     
     const c = $('imageContainer');
+    c.style.overflow = '';
     c.classList.remove('fit-height', 'fit-width');
     c.classList.add('fit-' + mode);
     $('fitHeight').classList.toggle('active', mode === 'height');
@@ -619,6 +653,32 @@ container.addEventListener('touchend', e => {{
     touch.isPinch = false;
 }}, {{ passive: true }});
 
+// Page jump input
+function jumpToPage(val) {{
+    const p = parseInt(val);
+    if (p && p >= 1 && p <= totalPages) {{
+        loadPage(p);
+    }} else {{
+        $('pageNum').value = currentPage; // Reset to current
+    }}
+}}
+
+$('pageNum').addEventListener('keydown', e => {{
+    if (e.key === 'Enter') {{
+        e.preventDefault();
+        jumpToPage(e.target.value);
+        e.target.blur();
+    }}
+}});
+
+$('pageNum').addEventListener('blur', e => {{
+    jumpToPage(e.target.value);
+}});
+
+$('pageNum').addEventListener('focus', e => {{
+    e.target.select();
+}});
+
 // Init
 window.onload = () => {{
     setFitMode(fitMode);
@@ -629,10 +689,9 @@ window.onload = () => {{
         document.querySelectorAll('.topic').forEach(el => {{
             if (parseInt(el.dataset.t) === t) el.closest('.strand').classList.add('expanded');
         }});
-    }} else {{
-        document.body.classList.remove('toc-collapsed');
-        document.querySelector('.strand')?.classList.add('expanded');
     }}
+    // TOC stays collapsed, first strand expanded for when user opens it
+    document.querySelector('.strand')?.classList.add('expanded');
 }};
 </script>
 </body>
