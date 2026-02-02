@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Maths Comic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .toc-toggle {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            z-index: 2000;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 0 6px 6px 0;
+            padding: 10px 8px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+        .toc-toggle:hover { background: #764ba2; padding-left: 12px; }
+        
+        .toc-sidebar {
+            width: 320px;
+            background: #222;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, width 0.3s;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        body.toc-collapsed .toc-sidebar { transform: translateX(-320px); width: 0; }
+        
+        .toc-header {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .toc-header h1 { font-size: 18px; color: #fff; margin-bottom: 4px; }
+        .toc-header p { font-size: 12px; color: rgba(255,255,255,0.7); }
+        
+        .toc-content { flex: 1; overflow-y: auto; padding: 10px; }
+        .toc-content::-webkit-scrollbar { width: 6px; }
+        .toc-content::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        
+        .strand { margin-bottom: 8px; }
+        .strand-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .strand-header:hover { background: #333; }
+        .strand-arrow { font-size: 10px; color: #888; transition: transform 0.2s; width: 12px; }
+        .strand.expanded .strand-arrow { transform: rotate(90deg); }
+        .strand-name { flex: 1; font-weight: 600; font-size: 14px; }
+        .strand-count { background: #444; color: #aaa; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+        
+        .strand-topics { max-height: 0; overflow: hidden; transition: max-height 0.3s; }
+        .strand.expanded .strand-topics { max-height: 2000px; }
+        
+        .topic {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px 10px 30px;
+            margin-top: 2px;
+            background: #252525;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .topic:hover { background: #333; }
+        .topic.active { background: #667eea; }
+        .topic-num { color: #667eea; font-weight: 600; font-size: 12px; min-width: 28px; }
+        .topic.active .topic-num { color: #fff; }
+        .topic-title { flex: 1; font-size: 13px; }
+        .topic-pages { color: #555; font-size: 11px; }
+        .topic.active .topic-pages { color: rgba(255,255,255,0.7); }
+        
+        .viewer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .top-bar {
+            background: #222;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            min-height: 50px;
+        }
+        .topic-name { font-size: 15px; color: #fff; }
+        .topic-name strong { color: #667eea; }
+        .top-right { display: flex; align-items: center; gap: 12px; }
+        .page-info { font-size: 13px; color: #888; }
+        .page-info span { color: #fff; }
+        
+        .copy-btn {
+            background: #333;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .copy-btn:hover { background: #444; }
+        .copy-btn.copied { background: #27ae60; border-color: #27ae60; color: #fff; }
+        
+        .image-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+            background: #111;
+        }
+        .image-container img { width: 100%; max-width: 950px; height: auto; }
+        
+        .side-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: none;
+            width: 50px;
+            height: 120px;
+            font-size: 26px;
+            cursor: pointer;
+            opacity: 0.4;
+        }
+        .side-nav:hover { opacity: 1; background: #667eea; }
+        .side-nav:disabled { opacity: 0.15; cursor: default; background: rgba(0,0,0,0.6); }
+        .side-nav.prev { left: 0; border-radius: 0 10px 10px 0; }
+        .side-nav.next { right: 0; border-radius: 10px 0 0 10px; }
+        
+        .landing {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        .landing h1 { font-size: 2rem; margin-bottom: 10px; }
+        .landing p { color: #888; margin-bottom: 20px; }
+        .landing-hint { color: #667eea; }
+        
+        .viewer-content { display: none; flex: 1; flex-direction: column; }
+        .viewer-content.active { display: flex; }
+        
+        @media (max-width: 600px) {
+            .toc-sidebar { width: 280px; }
+            body.toc-collapsed .toc-sidebar { transform: translateX(-280px); }
+            .side-nav { width: 40px; height: 80px; font-size: 20px; }
+        }
+    </style>
+</head>
+<body class="toc-collapsed">
+
+<button class="toc-toggle" onclick="toggleTOC()">📖</button>
+
+<div class="toc-sidebar">
+    <div class="toc-header">
+        <h1>📚 Maths Comic</h1>
+        <p>5 Strands · 60 Topics</p>
+    </div>
+    <div class="toc-content">
+        <div class="strand">
+            <div class="strand-header" onclick="toggleStrand(this)" style="border-left: 4px solid #e74c3c">
+                <span class="strand-arrow">▶</span>
+                <span class="strand-name">Number</span>
+                <span class="strand-count">38</span>
+            </div>
+            <div class="strand-topics">
+                <div class="topic" data-t="1" onclick="openTopic(1)">
+                    <span class="topic-num">1.</span>
+                    <span class="topic-title">Counting (Intro)</span>
+                    <span class="topic-pages">22p</span>
+                </div>
+                <div class="topic" data-t="2" onclick="openTopic(2)">
+                    <span class="topic-num">2.</span>
+                    <span class="topic-title">Comparing (Intro)</span>
+                    <span class="topic-pages">25p</span>
+                </div>
+                <div class="topic" data-t="3" onclick="openTopic(3)">
+                    <span class="topic-num">3.</span>
+                    <span class="topic-title">Comparing (More)</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="4" onclick="openTopic(4)">
+                    <span class="topic-num">4.</span>
+                    <span class="topic-title">Place Value</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="5" onclick="openTopic(5)">
+                    <span class="topic-num">5.</span>
+                    <span class="topic-title">Comparing (Numbers)</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="6" onclick="openTopic(6)">
+                    <span class="topic-num">6.</span>
+                    <span class="topic-title">Big Numbers (Intro)</span>
+                    <span class="topic-pages">20p</span>
+                </div>
+                <div class="topic" data-t="7" onclick="openTopic(7)">
+                    <span class="topic-num">7.</span>
+                    <span class="topic-title">Big Numbers (More)</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="8" onclick="openTopic(8)">
+                    <span class="topic-num">8.</span>
+                    <span class="topic-title">Odds & Evens</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+                <div class="topic" data-t="9" onclick="openTopic(9)">
+                    <span class="topic-num">9.</span>
+                    <span class="topic-title">Addition (Intro)</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="10" onclick="openTopic(10)">
+                    <span class="topic-num">10.</span>
+                    <span class="topic-title">Subtraction (Intro)</span>
+                    <span class="topic-pages">24p</span>
+                </div>
+                <div class="topic" data-t="11" onclick="openTopic(11)">
+                    <span class="topic-num">11.</span>
+                    <span class="topic-title">Addition & Subtraction</span>
+                    <span class="topic-pages">26p</span>
+                </div>
+                <div class="topic" data-t="12" onclick="openTopic(12)">
+                    <span class="topic-num">12.</span>
+                    <span class="topic-title">Addition (More)</span>
+                    <span class="topic-pages">26p</span>
+                </div>
+                <div class="topic" data-t="13" onclick="openTopic(13)">
+                    <span class="topic-num">13.</span>
+                    <span class="topic-title">Subtraction (More)</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="14" onclick="openTopic(14)">
+                    <span class="topic-num">14.</span>
+                    <span class="topic-title">Strategies (+ & -)</span>
+                    <span class="topic-pages">27p</span>
+                </div>
+                <div class="topic" data-t="15" onclick="openTopic(15)">
+                    <span class="topic-num">15.</span>
+                    <span class="topic-title">Algorithms (+ & -)</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+                <div class="topic" data-t="16" onclick="openTopic(16)">
+                    <span class="topic-num">16.</span>
+                    <span class="topic-title">Skip-Counting</span>
+                    <span class="topic-pages">24p</span>
+                </div>
+                <div class="topic" data-t="17" onclick="openTopic(17)">
+                    <span class="topic-num">17.</span>
+                    <span class="topic-title">Multiplication (Intro)</span>
+                    <span class="topic-pages">36p</span>
+                </div>
+                <div class="topic" data-t="18" onclick="openTopic(18)">
+                    <span class="topic-num">18.</span>
+                    <span class="topic-title">Multiplication (More)</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="19" onclick="openTopic(19)">
+                    <span class="topic-num">19.</span>
+                    <span class="topic-title">Division (Intro)</span>
+                    <span class="topic-pages">29p</span>
+                </div>
+                <div class="topic" data-t="20" onclick="openTopic(20)">
+                    <span class="topic-num">20.</span>
+                    <span class="topic-title">Division (More)</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="21" onclick="openTopic(21)">
+                    <span class="topic-num">21.</span>
+                    <span class="topic-title">Counting (Combinatorics)</span>
+                    <span class="topic-pages">33p</span>
+                </div>
+                <div class="topic" data-t="22" onclick="openTopic(22)">
+                    <span class="topic-num">22.</span>
+                    <span class="topic-title">Factors</span>
+                    <span class="topic-pages">35p</span>
+                </div>
+                <div class="topic" data-t="23" onclick="openTopic(23)">
+                    <span class="topic-num">23.</span>
+                    <span class="topic-title">Factors & Multiples</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+                <div class="topic" data-t="24" onclick="openTopic(24)">
+                    <span class="topic-num">24.</span>
+                    <span class="topic-title">Perfect Squares</span>
+                    <span class="topic-pages">24p</span>
+                </div>
+                <div class="topic" data-t="25" onclick="openTopic(25)">
+                    <span class="topic-num">25.</span>
+                    <span class="topic-title">Exponents (Intro)</span>
+                    <span class="topic-pages">40p</span>
+                </div>
+                <div class="topic" data-t="26" onclick="openTopic(26)">
+                    <span class="topic-num">26.</span>
+                    <span class="topic-title">Exponents (More)</span>
+                    <span class="topic-pages">38p</span>
+                </div>
+                <div class="topic" data-t="27" onclick="openTopic(27)">
+                    <span class="topic-num">27.</span>
+                    <span class="topic-title">Square Roots</span>
+                    <span class="topic-pages">32p</span>
+                </div>
+                <div class="topic" data-t="28" onclick="openTopic(28)">
+                    <span class="topic-num">28.</span>
+                    <span class="topic-title">Integers (Intro)</span>
+                    <span class="topic-pages">32p</span>
+                </div>
+                <div class="topic" data-t="29" onclick="openTopic(29)">
+                    <span class="topic-num">29.</span>
+                    <span class="topic-title">Integers (More)</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="30" onclick="openTopic(30)">
+                    <span class="topic-num">30.</span>
+                    <span class="topic-title">Fractions (Intro)</span>
+                    <span class="topic-pages">27p</span>
+                </div>
+                <div class="topic" data-t="31" onclick="openTopic(31)">
+                    <span class="topic-num">31.</span>
+                    <span class="topic-title">Fractions (+ & -)</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="32" onclick="openTopic(32)">
+                    <span class="topic-num">32.</span>
+                    <span class="topic-title">Fractions (× & ÷)</span>
+                    <span class="topic-pages">27p</span>
+                </div>
+                <div class="topic" data-t="33" onclick="openTopic(33)">
+                    <span class="topic-num">33.</span>
+                    <span class="topic-title">Fractions (More)</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+                <div class="topic" data-t="34" onclick="openTopic(34)">
+                    <span class="topic-num">34.</span>
+                    <span class="topic-title">Decimals (Intro)</span>
+                    <span class="topic-pages">32p</span>
+                </div>
+                <div class="topic" data-t="35" onclick="openTopic(35)">
+                    <span class="topic-num">35.</span>
+                    <span class="topic-title">Decimals (More)</span>
+                    <span class="topic-pages">32p</span>
+                </div>
+                <div class="topic" data-t="36" onclick="openTopic(36)">
+                    <span class="topic-num">36.</span>
+                    <span class="topic-title">Percents</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="37" onclick="openTopic(37)">
+                    <span class="topic-num">37.</span>
+                    <span class="topic-title">Ratios & Rates</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="38" onclick="openTopic(38)">
+                    <span class="topic-num">38.</span>
+                    <span class="topic-title">Estimation</span>
+                    <span class="topic-pages">22p</span>
+                </div>
+            </div>
+        </div>
+        <div class="strand">
+            <div class="strand-header" onclick="toggleStrand(this)" style="border-left: 4px solid #9b59b6">
+                <span class="strand-arrow">▶</span>
+                <span class="strand-name">Algebra</span>
+                <span class="strand-count">6</span>
+            </div>
+            <div class="strand-topics">
+                <div class="topic" data-t="39" onclick="openTopic(39)">
+                    <span class="topic-num">39.</span>
+                    <span class="topic-title">Patterns</span>
+                    <span class="topic-pages">20p</span>
+                </div>
+                <div class="topic" data-t="40" onclick="openTopic(40)">
+                    <span class="topic-num">40.</span>
+                    <span class="topic-title">Sequences</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="41" onclick="openTopic(41)">
+                    <span class="topic-num">41.</span>
+                    <span class="topic-title">Expressions (Intro)</span>
+                    <span class="topic-pages">31p</span>
+                </div>
+                <div class="topic" data-t="42" onclick="openTopic(42)">
+                    <span class="topic-num">42.</span>
+                    <span class="topic-title">Variables</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="43" onclick="openTopic(43)">
+                    <span class="topic-num">43.</span>
+                    <span class="topic-title">Distributive Property</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="44" onclick="openTopic(44)">
+                    <span class="topic-num">44.</span>
+                    <span class="topic-title">Expressions & Equations</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+            </div>
+        </div>
+        <div class="strand">
+            <div class="strand-header" onclick="toggleStrand(this)" style="border-left: 4px solid #27ae60">
+                <span class="strand-arrow">▶</span>
+                <span class="strand-name">Geometry & Measurement</span>
+                <span class="strand-count">9</span>
+            </div>
+            <div class="strand-topics">
+                <div class="topic" data-t="45" onclick="openTopic(45)">
+                    <span class="topic-num">45.</span>
+                    <span class="topic-title">Shapes (Intro)</span>
+                    <span class="topic-pages">21p</span>
+                </div>
+                <div class="topic" data-t="46" onclick="openTopic(46)">
+                    <span class="topic-num">46.</span>
+                    <span class="topic-title">Shapes (2D)</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="47" onclick="openTopic(47)">
+                    <span class="topic-num">47.</span>
+                    <span class="topic-title">Shapes (Properties)</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="48" onclick="openTopic(48)">
+                    <span class="topic-num">48.</span>
+                    <span class="topic-title">3D Solids</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+                <div class="topic" data-t="49" onclick="openTopic(49)">
+                    <span class="topic-num">49.</span>
+                    <span class="topic-title">Measurement (Intro)</span>
+                    <span class="topic-pages">26p</span>
+                </div>
+                <div class="topic" data-t="50" onclick="openTopic(50)">
+                    <span class="topic-num">50.</span>
+                    <span class="topic-title">Measurement (Units)</span>
+                    <span class="topic-pages">30p</span>
+                </div>
+                <div class="topic" data-t="51" onclick="openTopic(51)">
+                    <span class="topic-num">51.</span>
+                    <span class="topic-title">Measurement (More)</span>
+                    <span class="topic-pages">38p</span>
+                </div>
+                <div class="topic" data-t="52" onclick="openTopic(52)">
+                    <span class="topic-num">52.</span>
+                    <span class="topic-title">Perimeter & Area</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+                <div class="topic" data-t="53" onclick="openTopic(53)">
+                    <span class="topic-num">53.</span>
+                    <span class="topic-title">Area (More)</span>
+                    <span class="topic-pages">36p</span>
+                </div>
+            </div>
+        </div>
+        <div class="strand">
+            <div class="strand-header" onclick="toggleStrand(this)" style="border-left: 4px solid #3498db">
+                <span class="strand-arrow">▶</span>
+                <span class="strand-name">Statistics & Probability</span>
+                <span class="strand-count">2</span>
+            </div>
+            <div class="strand-topics">
+                <div class="topic" data-t="54" onclick="openTopic(54)">
+                    <span class="topic-num">54.</span>
+                    <span class="topic-title">Statistics</span>
+                    <span class="topic-pages">31p</span>
+                </div>
+                <div class="topic" data-t="55" onclick="openTopic(55)">
+                    <span class="topic-num">55.</span>
+                    <span class="topic-title">Probability</span>
+                    <span class="topic-pages">40p</span>
+                </div>
+            </div>
+        </div>
+        <div class="strand">
+            <div class="strand-header" onclick="toggleStrand(this)" style="border-left: 4px solid #f39c12">
+                <span class="strand-arrow">▶</span>
+                <span class="strand-name">Logic & Problem Solving</span>
+                <span class="strand-count">5</span>
+            </div>
+            <div class="strand-topics">
+                <div class="topic" data-t="56" onclick="openTopic(56)">
+                    <span class="topic-num">56.</span>
+                    <span class="topic-title">Categories</span>
+                    <span class="topic-pages">22p</span>
+                </div>
+                <div class="topic" data-t="57" onclick="openTopic(57)">
+                    <span class="topic-num">57.</span>
+                    <span class="topic-title">Logic</span>
+                    <span class="topic-pages">34p</span>
+                </div>
+                <div class="topic" data-t="58" onclick="openTopic(58)">
+                    <span class="topic-num">58.</span>
+                    <span class="topic-title">Problem Solving (Intro)</span>
+                    <span class="topic-pages">23p</span>
+                </div>
+                <div class="topic" data-t="59" onclick="openTopic(59)">
+                    <span class="topic-num">59.</span>
+                    <span class="topic-title">Problem Solving (Strategies)</span>
+                    <span class="topic-pages">28p</span>
+                </div>
+                <div class="topic" data-t="60" onclick="openTopic(60)">
+                    <span class="topic-num">60.</span>
+                    <span class="topic-title">Problem Solving (More)</span>
+                    <span class="topic-pages">20p</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="viewer">
+    <div class="landing" id="landing">
+        <h1>📚 Maths Comic</h1>
+        <p>60 Topics · JC Aligned</p>
+        <div class="landing-hint">← Open menu to select a topic</div>
+    </div>
+    
+    <div class="viewer-content" id="viewerContent">
+        <div class="top-bar">
+            <div class="topic-name" id="topicName"></div>
+            <div class="top-right">
+                <div class="page-info"><span id="pageNum">1</span> / <span id="totalPages">1</span></div>
+                <button class="copy-btn" onclick="copyLink()">🔗 Copy</button>
+            </div>
+        </div>
+        <div class="image-container" id="imageContainer">
+            <img id="pageImage" src="" alt="">
+        </div>
+    </div>
+</div>
+
+<button class="side-nav prev" id="prevBtn" onclick="prevPage()" style="display:none;">◀</button>
+<button class="side-nav next" id="nextBtn" onclick="nextPage()" style="display:none;">▶</button>
+
+<script>
+const topics = {
+    1: {title: "Counting (Intro)", pages: 22},
+    2: {title: "Comparing (Intro)", pages: 25},
+    3: {title: "Comparing (More)", pages: 28},
+    4: {title: "Place Value", pages: 28},
+    5: {title: "Comparing (Numbers)", pages: 28},
+    6: {title: "Big Numbers (Intro)", pages: 20},
+    7: {title: "Big Numbers (More)", pages: 28},
+    8: {title: "Odds & Evens", pages: 34},
+    9: {title: "Addition (Intro)", pages: 30},
+    10: {title: "Subtraction (Intro)", pages: 24},
+    11: {title: "Addition & Subtraction", pages: 26},
+    12: {title: "Addition (More)", pages: 26},
+    13: {title: "Subtraction (More)", pages: 30},
+    14: {title: "Strategies (+ & -)", pages: 27},
+    15: {title: "Algorithms (+ & -)", pages: 34},
+    16: {title: "Skip-Counting", pages: 24},
+    17: {title: "Multiplication (Intro)", pages: 36},
+    18: {title: "Multiplication (More)", pages: 28},
+    19: {title: "Division (Intro)", pages: 29},
+    20: {title: "Division (More)", pages: 30},
+    21: {title: "Counting (Combinatorics)", pages: 33},
+    22: {title: "Factors", pages: 35},
+    23: {title: "Factors & Multiples", pages: 34},
+    24: {title: "Perfect Squares", pages: 24},
+    25: {title: "Exponents (Intro)", pages: 40},
+    26: {title: "Exponents (More)", pages: 38},
+    27: {title: "Square Roots", pages: 32},
+    28: {title: "Integers (Intro)", pages: 32},
+    29: {title: "Integers (More)", pages: 30},
+    30: {title: "Fractions (Intro)", pages: 27},
+    31: {title: "Fractions (+ & -)", pages: 30},
+    32: {title: "Fractions (× & ÷)", pages: 27},
+    33: {title: "Fractions (More)", pages: 34},
+    34: {title: "Decimals (Intro)", pages: 32},
+    35: {title: "Decimals (More)", pages: 32},
+    36: {title: "Percents", pages: 28},
+    37: {title: "Ratios & Rates", pages: 28},
+    38: {title: "Estimation", pages: 22},
+    39: {title: "Patterns", pages: 20},
+    40: {title: "Sequences", pages: 30},
+    41: {title: "Expressions (Intro)", pages: 31},
+    42: {title: "Variables", pages: 30},
+    43: {title: "Distributive Property", pages: 30},
+    44: {title: "Expressions & Equations", pages: 34},
+    45: {title: "Shapes (Intro)", pages: 21},
+    46: {title: "Shapes (2D)", pages: 30},
+    47: {title: "Shapes (Properties)", pages: 28},
+    48: {title: "3D Solids", pages: 34},
+    49: {title: "Measurement (Intro)", pages: 26},
+    50: {title: "Measurement (Units)", pages: 30},
+    51: {title: "Measurement (More)", pages: 38},
+    52: {title: "Perimeter & Area", pages: 34},
+    53: {title: "Area (More)", pages: 36},
+    54: {title: "Statistics", pages: 31},
+    55: {title: "Probability", pages: 40},
+    56: {title: "Categories", pages: 22},
+    57: {title: "Logic", pages: 34},
+    58: {title: "Problem Solving (Intro)", pages: 23},
+    59: {title: "Problem Solving (Strategies)", pages: 28},
+    60: {title: "Problem Solving (More)", pages: 20},
+};
+
+let currentTopic = 0;
+let currentPage = 1;
+let totalPages = 1;
+
+function toggleTOC() { document.body.classList.toggle('toc-collapsed'); }
+function toggleStrand(el) { el.parentElement.classList.toggle('expanded'); }
+
+function openTopic(t) {
+    if (!topics[t]) return;
+    
+    currentTopic = t;
+    totalPages = topics[t].pages;
+    currentPage = 1;
+    
+    const params = new URLSearchParams(location.search);
+    if (parseInt(params.get('t')) === t && params.get('p')) {
+        currentPage = Math.max(1, Math.min(totalPages, parseInt(params.get('p'))));
+    }
+    
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('viewerContent').classList.add('active');
+    document.getElementById('prevBtn').style.display = 'flex';
+    document.getElementById('nextBtn').style.display = 'flex';
+    document.getElementById('topicName').innerHTML = '<strong>' + t + '.</strong> ' + topics[t].title;
+    document.getElementById('totalPages').textContent = totalPages;
+    
+    document.querySelectorAll('.topic').forEach(el => {
+        el.classList.toggle('active', parseInt(el.dataset.t) === t);
+    });
+    
+    if (window.innerWidth <= 600) toggleTOC();
+    updatePage();
+}
+
+function updatePage() {
+    const img = currentTopic + String(currentPage).padStart(2,'0') + '.webp';
+    document.getElementById('pageImage').src = img;
+    document.getElementById('pageNum').textContent = currentPage;
+    document.getElementById('prevBtn').disabled = currentPage <= 1;
+    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+    history.replaceState(null, '', '?t=' + currentTopic + '&p=' + currentPage);
+}
+
+function prevPage() { if (currentPage > 1) { currentPage--; updatePage(); } }
+function nextPage() { if (currentPage < totalPages) { currentPage++; updatePage(); } }
+
+function copyLink() {
+    navigator.clipboard.writeText(location.href).then(() => {
+        const b = document.querySelector('.copy-btn');
+        b.classList.add('copied');
+        b.textContent = '✓ Copied!';
+        setTimeout(() => { b.classList.remove('copied'); b.textContent = '🔗 Copy'; }, 2000);
+    });
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') prevPage();
+    if (e.key === 'ArrowRight') nextPage();
+    if (e.key === 't' || e.key === 'T') toggleTOC();
+});
+
+let touchX = 0;
+document.getElementById('imageContainer').addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+document.getElementById('imageContainer').addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(diff) > 50) diff > 0 ? prevPage() : nextPage();
+});
+
+window.onload = () => {
+    const params = new URLSearchParams(location.search);
+    const t = parseInt(params.get('t'));
+    if (t && topics[t]) {
+        openTopic(t);
+        document.querySelectorAll('.topic').forEach(el => {
+            if (parseInt(el.dataset.t) === t) el.closest('.strand').classList.add('expanded');
+        });
+    } else {
+        document.body.classList.remove('toc-collapsed');
+        const first = document.querySelector('.strand');
+        if (first) first.classList.add('expanded');
+    }
+};
+</script>
+</body>
+</html>

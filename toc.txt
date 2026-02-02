@@ -1,0 +1,77 @@
+# Maths Comic - JC Strands
+# Format: STRAND|name or TOPIC|num|title|orig_book|orig_chap
+
+STRAND|Number
+
+TOPIC|01|Counting (Intro)|1|1
+TOPIC|02|Comparing (Intro)|1|3
+TOPIC|03|Comparing (More)|1|8
+TOPIC|04|Place Value|2|1
+TOPIC|05|Comparing (Numbers)|2|2
+TOPIC|06|Big Numbers (Intro)|1|10
+TOPIC|07|Big Numbers (More)|2|10
+TOPIC|08|Odds & Evens|2|9
+TOPIC|09|Addition (Intro)|1|4
+TOPIC|10|Subtraction (Intro)|1|5
+TOPIC|11|Addition & Subtraction|1|7
+TOPIC|12|Addition (More)|2|3
+TOPIC|13|Subtraction (More)|2|4
+TOPIC|14|Strategies (+ & -)|2|8
+TOPIC|15|Algorithms (+ & -)|2|11
+TOPIC|16|Skip-Counting|3|2
+TOPIC|17|Multiplication (Intro)|3|4
+TOPIC|18|Multiplication (More)|4|2
+TOPIC|19|Division (Intro)|3|8
+TOPIC|20|Division (More)|4|5
+TOPIC|21|Counting (Combinatorics)|4|4
+TOPIC|22|Factors|4|7
+TOPIC|23|Factors & Multiples|5|5
+TOPIC|24|Perfect Squares|3|5
+TOPIC|25|Exponents (Intro)|4|3
+TOPIC|26|Exponents (More)|5|12
+TOPIC|27|Square Roots|5|11
+TOPIC|28|Integers (Intro)|4|9
+TOPIC|29|Integers (More)|5|2
+TOPIC|30|Fractions (Intro)|3|10
+TOPIC|31|Fractions (+ & -)|4|8
+TOPIC|32|Fractions (× & ÷)|4|10
+TOPIC|33|Fractions (More)|5|6
+TOPIC|34|Decimals (Intro)|4|11
+TOPIC|35|Decimals (More)|5|9
+TOPIC|36|Percents|5|10
+TOPIC|37|Ratios & Rates|5|8
+TOPIC|38|Estimation|3|11
+
+STRAND|Algebra
+
+TOPIC|39|Patterns|1|9
+TOPIC|40|Sequences|5|7
+TOPIC|41|Expressions (Intro)|2|5
+TOPIC|42|Variables|3|7
+TOPIC|43|Distributive Property|3|6
+TOPIC|44|Expressions & Equations|5|3
+
+STRAND|Geometry & Measurement
+
+TOPIC|45|Shapes (Intro)|1|2
+TOPIC|46|Shapes (2D)|3|1
+TOPIC|47|Shapes (Properties)|4|1
+TOPIC|48|3D Solids|5|1
+TOPIC|49|Measurement (Intro)|1|11
+TOPIC|50|Measurement (Units)|2|7
+TOPIC|51|Measurement (More)|3|9
+TOPIC|52|Perimeter & Area|3|3
+TOPIC|53|Area (More)|3|12
+
+STRAND|Statistics & Probability
+
+TOPIC|54|Statistics|5|4
+TOPIC|55|Probability|4|12
+
+STRAND|Logic & Problem Solving
+
+TOPIC|56|Categories|1|6
+TOPIC|57|Logic|4|6
+TOPIC|58|Problem Solving (Intro)|1|12
+TOPIC|59|Problem Solving (Strategies)|2|6
+TOPIC|60|Problem Solving (More)|2|12
