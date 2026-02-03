@@ -10,8 +10,7 @@ Combined script for:
   2. Converting JPEGs to WebPs + building index (full build)
 
 Usage:
-  python rebuild.py          # Interactive menu
-  python rebuild.py index    # Just rebuild index.html
+  python rebuild.py          # Rebuild index.html
   python rebuild.py convert  # Convert JPEGs + rebuild index
 """
 
@@ -22,23 +21,27 @@ import shutil
 import re
 from pathlib import Path
 
+# Use script's folder, not cwd
+SCRIPT_DIR = Path(__file__).parent.resolve()
+os.chdir(SCRIPT_DIR)
+
 # ============================================================
-# CONFIG - Edit these paths for your setup
+# CONFIG
 # ============================================================
-COMIC_PATH = Path(r"E:\comic")          # Main folder (WebPs + index.html)
-SOURCE_PATH = Path(r"E:\comic")          # Where book-*/chap*/jpegs/ folders are
-TOC_FILE = COMIC_PATH / "toc.txt"        # Your TOC file
-WEBP_QUALITY = 75                        # WebP quality (1-100)
-IMG_FOLDER = "webp"                      # Subfolder for images (blank = same as index.html)
+COMIC_PATH = SCRIPT_DIR                       # Main folder (WebPs + index.html)
+SOURCE_PATH = SCRIPT_DIR                      # Where book-*/chap*/jpegs/ folders are
+TOC_FILE = COMIC_PATH / "toc.txt"             # Your TOC file
+WEBP_QUALITY = 75                             # WebP quality (1-100)
+IMG_FOLDER = "webp"                           # Subfolder for images (blank = same as index.html)
 # ============================================================
 
 # Strand colors for TOC
 STRAND_COLORS = {
-    'Number':                   ('red',    '#e53935'),
-    'Algebra':                  ('blue',   '#1e88e5'),
-    'Geometry & Measurement':   ('green',  '#43a047'),
-    'Statistics & Probability': ('orange', '#fb8c00'),
-    'Logic & Problem Solving':  ('purple', '#8e24aa'),
+    'number':                   ('red',    '#e53935'),
+    'algebra':                  ('blue',   '#1e88e5'),
+    'geometry & measurement':   ('green',  '#43a047'),
+    'statistics & probability': ('orange', '#fb8c00'),
+    'logic & problem solving':  ('purple', '#8e24aa'),
 }
 
 def parse_toc(toc_path):
@@ -58,9 +61,9 @@ def parse_toc(toc_path):
                 continue
             
             parts = line.split('|')
-            if parts[0] == 'STRAND':
+            if parts[0].upper() == 'STRAND':
                 name = parts[1]
-                color_key, color_hex = STRAND_COLORS.get(name, ('grey', '#666'))
+                color_key, color_hex = STRAND_COLORS.get(name.lower(), ('grey', '#666'))
                 current_strand = {
                     'name': name,
                     'color_key': color_key,
@@ -68,7 +71,7 @@ def parse_toc(toc_path):
                     'topics': []
                 }
                 strands.append(current_strand)
-            elif parts[0] == 'TOPIC' and current_strand:
+            elif parts[0].upper() == 'TOPIC' and current_strand:
                 num = int(parts[1])
                 topic = {
                     'num': num,
@@ -187,12 +190,13 @@ def generate_index(strands, page_counts):
     <!-- ============ END TRACKING ============ -->
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
-        html {{ height: 100%; }}
+        html {{ height: 100%; height: 100dvh; }}
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f5f5f5;
             color: #333;
             height: 100%;
+            height: 100dvh;
             overflow: hidden;
             display: flex;
         }}
@@ -299,8 +303,11 @@ def generate_index(strands, page_counts):
             flex-shrink: 0;
         }}
         
-        .topic-name {{ font-size: 12px; color: #333; margin-right: auto; }}
+        .topic-name {{ font-size: 12px; color: #333; margin-right: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40%; }}
         .topic-name strong {{ color: #1e88e5; }}
+        
+        .link-btn {{ font-size: 10px; padding: 4px 6px; }}
+        .link-btn.copied {{ background: #4caf50; border-color: #4caf50; color: #fff; }}
         
         button {{
             background: #f5f5f5;
@@ -342,14 +349,17 @@ def generate_index(strands, page_counts):
             justify-content: center;
             min-height: 0;
             position: relative;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x pan-y pinch-zoom;
         }}
         .image-container img {{ 
             display: block; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
             background: #fff;
         }}
-        .fit-height img {{ height: 100%; }}
-        .fit-width img {{ max-width: 100%; }}
+        .fit-height {{ align-items: center; }}
+        .fit-height img {{ max-height: 100%; width: auto; }}
+        .fit-width img {{ max-width: 100%; height: auto; }}
         
         .zoom-indicator {{
             position: absolute;
@@ -383,7 +393,8 @@ def generate_index(strands, page_counts):
         }}
         .side-nav:hover {{ opacity: 1; background: #1e88e5; }}
         .side-nav:disabled {{ opacity: 0.2; cursor: default; background: rgba(0,0,0,0.3); }}
-        .side-nav.prev {{ left: 0; border-radius: 0 4px 4px 0; }}
+        .side-nav.prev {{ left: 200px; border-radius: 0 4px 4px 0; }}
+        body.toc-collapsed .side-nav.prev {{ left: 0; }}
         .side-nav.next {{ right: 0; border-radius: 4px 0 0 4px; }}
         
         /* Landing */
@@ -400,7 +411,7 @@ def generate_index(strands, page_counts):
         .landing h1 {{ font-size: 1.5rem; color: #333; margin-bottom: 8px; font-weight: 500; }}
         .landing p {{ color: #888; font-size: 13px; }}
         
-        .viewer-content {{ display: none; flex: 1; flex-direction: column; }}
+        .viewer-content {{ display: none; flex: 1; flex-direction: column; min-height: 0; overflow: hidden; }}
         .viewer-content.active {{ display: flex; }}
         
         .image-container::-webkit-scrollbar {{ width: 6px; height: 6px; }}
@@ -409,8 +420,17 @@ def generate_index(strands, page_counts):
         @media (max-width: 600px) {{
             .toc-sidebar {{ width: 180px; }}
             body.toc-collapsed .toc-sidebar {{ transform: translateX(-180px); }}
-            .controls {{ padding: 4px 6px; gap: 4px; }}
+            .controls {{ padding: 4px 6px; gap: 4px; flex-wrap: nowrap; }}
+            .topic-name {{ max-width: 30%; font-size: 11px; }}
             .side-nav {{ width: 30px; height: 60px; font-size: 14px; }}
+            .link-btn {{ padding: 4px 5px; }}
+        }}
+        
+        @media (max-height: 500px) {{
+            /* Landscape phone */
+            .controls {{ padding: 2px 6px; min-height: 30px; }}
+            .controls button {{ height: 22px; padding: 2px 6px; }}
+            .topic-name {{ font-size: 10px; }}
         }}
     </style>
 </head>
@@ -435,6 +455,8 @@ def generate_index(strands, page_counts):
     <div class="viewer-content" id="viewerContent">
         <div class="controls">
             <div class="topic-name" id="topicName"></div>
+            <button class="link-btn" id="linkBtn" onclick="copyLink()" title="Copy link">🔗</button>
+            <div class="sep"></div>
             <button id="fitHeight" onclick="setFitMode('height')" title="Fit Height (H)">↕</button>
             <button id="fitWidth" onclick="setFitMode('width')" title="Fit Width (W)">↔</button>
             <div class="sep"></div>
@@ -492,7 +514,7 @@ function openTopic(t) {{
         el.classList.toggle('active', parseInt(el.dataset.t) === t);
     }});
     
-    if (window.innerWidth <= 600) toggleTOC();
+    if (!document.body.classList.contains('toc-collapsed')) toggleTOC();
     loadPage(currentPage);
 }}
 
@@ -540,6 +562,19 @@ function updateZoom() {{
 function zoomIn() {{ zoom = Math.min(3, zoom + 0.25); updateZoom(); }}
 function zoomOut() {{ zoom = Math.max(0.5, zoom - 0.25); updateZoom(); }}
 function resetZoom() {{ zoom = 1; updateZoom(); }}
+
+function copyLink() {{
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {{
+        const btn = $('linkBtn');
+        btn.textContent = '✓';
+        btn.classList.add('copied');
+        setTimeout(() => {{
+            btn.textContent = '🔗';
+            btn.classList.remove('copied');
+        }}, 1500);
+    }});
+}}
 
 function setFitMode(mode) {{
     fitMode = mode;
@@ -595,7 +630,7 @@ $('pageImage').addEventListener('dblclick', e => {{
     resetZoom();
 }});
 
-// Touch: pinch zoom + swipe navigation
+// Touch: pinch zoom + swipe navigation (only at zoom=1)
 let touch = {{ startX: 0, startY: 0, startDist: 0, startZoom: 1, isPinch: false }};
 
 container.addEventListener('touchstart', e => {{
@@ -622,13 +657,14 @@ container.addEventListener('touchmove', e => {{
         zoom = Math.max(0.5, Math.min(3, touch.startZoom * (dist / touch.startDist)));
         updateZoom();
     }}
+    // Single finger = native scroll/pan (don't interfere)
 }}, {{ passive: true }});
 
 container.addEventListener('touchend', e => {{
-    if (e.touches.length === 0 && !touch.isPinch) {{
+    if (e.touches.length === 0 && !touch.isPinch && zoom === 1) {{
+        // Only swipe-to-navigate when not zoomed
         const diffX = e.changedTouches[0].clientX - touch.startX;
         const diffY = e.changedTouches[0].clientY - touch.startY;
-        // Horizontal swipe > vertical = page navigation
         if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {{
             if (diffX > 0) loadPage(currentPage - 1);
             else loadPage(currentPage + 1);
