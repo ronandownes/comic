@@ -158,36 +158,20 @@
         /* Image Container */
         .image-container {
             flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
             overflow: auto;
             background: #e8e8e8;
+            display: flex;
+            justify-content: center;
+            min-height: 0;
             position: relative;
-            min-height: 0; /* Critical for flex height to work */
-            -webkit-overflow-scrolling: touch;
         }
         .image-container img { 
             display: block; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
             background: #fff;
         }
-        .image-container.fit-height { 
-            align-items: center;
-            overflow: hidden; /* No scroll when fit */
-        }
-        .image-container.fit-height img { 
-            max-height: 100%;
-            max-width: 100%;
-            width: auto; 
-            height: auto;
-            object-fit: contain;
-        }
-        .image-container.fit-width img { 
-            width: 100%; 
-            max-width: 900px; 
-            height: auto;
-        }
+        .fit-height img { height: 100%; }
+        .fit-width img { max-width: 100%; }
         
         .zoom-indicator {
             position: absolute;

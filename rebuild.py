@@ -336,36 +336,20 @@ def generate_index(strands, page_counts):
         /* Image Container */
         .image-container {{
             flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
             overflow: auto;
             background: #e8e8e8;
+            display: flex;
+            justify-content: center;
+            min-height: 0;
             position: relative;
-            min-height: 0; /* Critical for flex height to work */
-            -webkit-overflow-scrolling: touch;
         }}
         .image-container img {{ 
             display: block; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
             background: #fff;
         }}
-        .image-container.fit-height {{ 
-            align-items: center;
-            overflow: hidden; /* No scroll when fit */
-        }}
-        .image-container.fit-height img {{ 
-            max-height: 100%;
-            max-width: 100%;
-            width: auto; 
-            height: auto;
-            object-fit: contain;
-        }}
-        .image-container.fit-width img {{ 
-            width: 100%; 
-            max-width: 900px; 
-            height: auto;
-        }}
+        .fit-height img {{ height: 100%; }}
+        .fit-width img {{ max-width: 100%; }}
         
         .zoom-indicator {{
             position: absolute;
@@ -815,41 +799,16 @@ def main():
     # Command line args
     if len(sys.argv) > 1:
         cmd = sys.argv[1].lower()
-        if cmd == 'index':
-            cmd_index()
-        elif cmd == 'convert':
+        if cmd == 'convert':
             cmd_convert()
+            input("\nPress Enter to exit...")
         else:
             print(f"Unknown command: {cmd}")
-            print("Usage: python rebuild.py [index|convert]")
+            print("Usage: python rebuild.py [convert]")
         return
     
-    # Interactive menu
-    print("=" * 50)
-    print("MATHS COMIC REBUILD")
-    print("=" * 50)
-    print(f"Path: {COMIC_PATH}")
-    print("=" * 50)
-    print()
-    print("  1. Rebuild index.html (from existing WebPs)")
-    print("  2. Convert JPEGs → WebPs + rebuild index")
-    print("  3. Exit")
-    print()
-    
-    choice = input("Choice (1-3): ").strip()
-    
-    if choice == '1':
-        cmd_index()
-    elif choice == '2':
-        cmd_convert()
-    elif choice == '3':
-        print("Bye!")
-        return
-    else:
-        print("Invalid choice")
-        return
-    
-    input("\nPress Enter to exit...")
+    # Default: rebuild index
+    cmd_index()
 
 if __name__ == "__main__":
     main()
