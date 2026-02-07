@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build-comic.py v09 - Image Viewer Generator
+build-comic.py v10 - Image Viewer Generator
 Drop in any folder with images, run to generate index.html
 
 Features:
@@ -30,7 +30,7 @@ import json
 import re
 from pathlib import Path
 
-VERSION = "09"
+VERSION = "10"
 
 # Image extensions to find
 IMG_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
@@ -248,23 +248,29 @@ def get_template():
         .side-nav.next { right: 10px; }
         
         /* Scroll nav buttons (vertical) - only visible in fit-width */
+        /* Scroll nav - side by side at top (desktop only) */
+        .scroll-nav-container {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            z-index: 1100; display: flex; gap: 8px;
+            opacity: 0; pointer-events: none; transition: opacity 0.15s ease;
+        }
+        body.show-scroll-nav .scroll-nav-container { opacity: 1; pointer-events: auto; }
         .scroll-nav {
-            position: fixed; left: 50%; transform: translateX(-50%); z-index: 1100;
             background: rgba(255,255,255,0.85); color: #262626; border: none;
             width: 36px; height: 36px; border-radius: 50%;
-            cursor: pointer; opacity: 0; transition: all 0.15s ease;
+            cursor: pointer; opacity: 0.6; transition: all 0.15s ease;
             font-size: 18px; font-weight: 300;
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            pointer-events: none;
         }
         .scroll-nav:hover { opacity: 1; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
-        .scroll-nav.down { top: 60px; }
-        .scroll-nav.up { bottom: 20px; }
-        body.show-scroll-nav .scroll-nav { opacity: 0.6; pointer-events: auto; }
-        /* Hide scroll nav on touch devices - they can scroll naturally */
+        /* Hide scroll nav on touch devices */
         @media (pointer: coarse) {
-            .scroll-nav { display: none !important; }
+            .scroll-nav-container { display: none !important; }
+        }
+        .hide-mobile { }
+        @media (max-width: 600px) {
+            .hide-mobile { display: none !important; }
         }
         
         /* Fullscreen mode - hide controls until tapped, but keep nav visible */
@@ -314,8 +320,6 @@ def get_template():
             .side-nav.prev { left: 6px; }
             .side-nav.next { right: 6px; }
             .scroll-nav { width: 32px; height: 32px; font-size: 16px; }
-            .scroll-nav.down { top: 54px; }
-            .scroll-nav.up { bottom: 14px; }
         }
     </style>
 </head>
@@ -335,15 +339,13 @@ def get_template():
     <div class="controls">
         <div class="page-info">
             <span id="currentPage">1</span>
-            <span style="color:#666">/</span>
-            <span id="totalPages" style="color:#666">1</span>
         </div>
         <div class="sep"></div>
-        <button id="fitHeight" title="Fit Height (H)">↕<small>H</small></button>
-        <button id="fitWidth" title="Fit Width (W)">↔<small>W</small></button>
-        <div class="sep"></div>
-        <button id="zoomOut" title="Zoom Out">−</button>
-        <button id="zoomIn" title="Zoom In">+</button>
+        <button id="fitHeight" title="Fit Height (H)">↕</button>
+        <button id="fitWidth" title="Fit Width (W)">↔</button>
+        <div class="sep hide-mobile"></div>
+        <button id="zoomOut" class="hide-mobile" title="Zoom Out">−</button>
+        <button id="zoomIn" class="hide-mobile" title="Zoom In">+</button>
         <div class="sep"></div>
         <button id="copyLink" title="Copy Link">🔗</button>
         <button id="fullscreen" title="Fullscreen (F)">⛶</button>
@@ -364,8 +366,10 @@ def get_template():
 </div>
 <button class="side-nav prev" id="sidePrev">‹</button>
 <button class="side-nav next" id="sideNext">›</button>
-<button class="scroll-nav down" id="scrollDown">↓</button>
-<button class="scroll-nav up" id="scrollUp">↑</button>
+<div class="scroll-nav-container">
+    <button class="scroll-nav" id="scrollUp">↑</button>
+    <button class="scroll-nav" id="scrollDown">↓</button>
+</div>
 
 
 
@@ -588,7 +592,6 @@ container.addEventListener('touchend', e => {
 });
 
 // Init
-$('totalPages').textContent = CONFIG.pages.length;
 renderTOC();
 setFitMode(state.fitMode);
 const hash = location.hash.match(/#page=(\\d+)/);
