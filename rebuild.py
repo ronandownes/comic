@@ -536,17 +536,15 @@ function updateZoom() {{
     const img = $('pageImage');
     const container = $('imageContainer');
     
-    // Remove fit classes temporarily for manual zoom
     if (zoom !== 1) {{
         container.classList.remove('fit-height', 'fit-width');
-        container.style.overflow = 'auto'; // Allow scroll when zoomed
-        // Set actual dimensions based on zoom
-        img.style.width = (zoom * 100) + '%';
-        img.style.height = 'auto';
+        container.style.overflow = 'auto';
+        // Use natural dimensions * zoom
+        img.style.width = (img.naturalWidth * zoom) + 'px';
+        img.style.height = (img.naturalHeight * zoom) + 'px';
         img.style.maxWidth = 'none';
         img.style.maxHeight = 'none';
     }} else {{
-        // Reset to fit mode
         img.style.width = '';
         img.style.height = '';
         img.style.maxWidth = '';
@@ -578,7 +576,7 @@ function copyLink() {{
 
 function setFitMode(mode) {{
     fitMode = mode;
-    zoom = 1; // Reset zoom when changing fit mode
+    zoom = 1;
     const img = $('pageImage');
     img.style.width = '';
     img.style.height = '';
