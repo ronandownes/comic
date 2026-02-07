@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build-comic.py v08 - Image Viewer Generator
+build-comic.py v09 - Image Viewer Generator
 Drop in any folder with images, run to generate index.html
 
 Features:
@@ -30,7 +30,7 @@ import json
 import re
 from pathlib import Path
 
-VERSION = "08"
+VERSION = "09"
 
 # Image extensions to find
 IMG_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
@@ -267,11 +267,10 @@ def get_template():
             .scroll-nav { display: none !important; }
         }
         
-        /* Fullscreen mode - hide controls until tapped */
+        /* Fullscreen mode - hide controls until tapped, but keep nav visible */
         :fullscreen .controls,
         :fullscreen .toc-toggle,
         :fullscreen .toc-sidebar,
-        :fullscreen .side-nav,
         :fullscreen .scroll-nav,
         :fullscreen .zoom-indicator {
             opacity: 0;
@@ -280,13 +279,15 @@ def get_template():
         }
         :fullscreen.show-controls .controls,
         :fullscreen.show-controls .toc-toggle,
-        :fullscreen.show-controls .side-nav,
         :fullscreen.show-controls .scroll-nav,
         :fullscreen.show-controls .zoom-indicator {
             opacity: 1;
             pointer-events: auto;
         }
         :fullscreen .toc-sidebar { display: none; }
+        /* Side nav always visible in fullscreen */
+        :fullscreen .side-nav { opacity: 0.5; pointer-events: auto; }
+        :fullscreen .side-nav:hover { opacity: 1; }
         
         /* Fullscreen info overlay */
         #fsInfo {

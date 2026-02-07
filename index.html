@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- build-comic.py v08 | 2026-02-07 23:05 -->
+<!-- build-comic.py v09 | 2026-02-07 23:11 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Comic</title>
     <link rel="canonical" href="./comic/">
-    <meta name="generator" content="build-comic.py v08">
+    <meta name="generator" content="build-comic.py v09">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { height: 100dvh; overflow: hidden; touch-action: pan-x pan-y; }
@@ -141,11 +141,10 @@
             .scroll-nav { display: none !important; }
         }
         
-        /* Fullscreen mode - hide controls until tapped */
+        /* Fullscreen mode - hide controls until tapped, but keep nav visible */
         :fullscreen .controls,
         :fullscreen .toc-toggle,
         :fullscreen .toc-sidebar,
-        :fullscreen .side-nav,
         :fullscreen .scroll-nav,
         :fullscreen .zoom-indicator {
             opacity: 0;
@@ -154,13 +153,15 @@
         }
         :fullscreen.show-controls .controls,
         :fullscreen.show-controls .toc-toggle,
-        :fullscreen.show-controls .side-nav,
         :fullscreen.show-controls .scroll-nav,
         :fullscreen.show-controls .zoom-indicator {
             opacity: 1;
             pointer-events: auto;
         }
         :fullscreen .toc-sidebar { display: none; }
+        /* Side nav always visible in fullscreen */
+        :fullscreen .side-nav { opacity: 0.5; pointer-events: auto; }
+        :fullscreen .side-nav:hover { opacity: 1; }
         
         /* Fullscreen info overlay */
         #fsInfo {
@@ -232,7 +233,7 @@
 <div id="fsInfo">
     <h2>Comic</h2>
     <div class="info-row">Page <span id="fsPage">1</span> of <span id="fsTotal">1</span></div>
-    <div class="info-row">build-comic.py v08 | 2026-02-07 23:05</div>
+    <div class="info-row">build-comic.py v09 | 2026-02-07 23:11</div>
     <div class="hint">Tap anywhere to show controls<br><strong>Tap again</strong> or wait to hide</div>
 </div>
 <button class="side-nav prev" id="sidePrev">‹</button>
