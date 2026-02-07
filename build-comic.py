@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-build-comic.py v07 - Image Viewer Generator
+build-comic.py v08 - Image Viewer Generator
 Drop in any folder with images, run to generate index.html
 
 Features:
-  - Ruler (📏) for classroom reading - drag, rotate, measure
-  - Drawing tools: pens (red/blue/green/black) + highlighters (yellow/green/blue/pink)
+  - Instagram-style ‹ › page navigation
+  - ↑ ↓ scroll buttons (desktop only, fit-width mode)
   - TOC sidebar with STRAND/TOPIC support
   - Fit height/width modes
   - Zoom with Ctrl+scroll
@@ -18,7 +18,6 @@ Navigation:
   Arrow Left/Right - prev/next page (or pan when zoomed)
   Arrow Up/Down    - scroll (fit-width) or pan (zoomed)
   PageUp/PageDown  - prev/next page
-  Space+drag       - pan image
   Double-click     - reset zoom
   H key            - fit height
   W key            - fit width
@@ -124,7 +123,7 @@ def parse_toc(folder, images=None):
     return {'chapters': chapters} if chapters else None
 
 def get_template():
-    """Return the embedded viewer template with ruler and drawing tools"""
+    """Return the embedded viewer template"""
     return '''<!DOCTYPE html>
 <!-- build-comic.py v__VERSION__ | __DATE__ -->
 <html lang="en">
@@ -263,136 +262,47 @@ def get_template():
         .scroll-nav.down { top: 60px; }
         .scroll-nav.up { bottom: 20px; }
         body.show-scroll-nav .scroll-nav { opacity: 0.6; pointer-events: auto; }
-        
-        /* Ruler */
-        #ruler {
-            position: fixed; left: -25%; right: -25%; height: 56px;
-            top: 50%; transform: translateY(-50%); z-index: 9995;
-            display: none; user-select: none; cursor: ns-resize; touch-action: none;
-        }
-        #ruler .ruler-body {
-            width: 100%; height: 100%;
-            background: rgba(80,80,90,0.22);
-            border-top: 1px solid rgba(255,255,255,0.3);
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-            backdrop-filter: blur(1px); position: relative; overflow: hidden;
-        }
-        #ruler.dragging .ruler-body { background: rgba(80,80,90,0.32); }
-        #ruler .tick { position: absolute; width: 1px; background: rgba(255,255,255,0.7); }
-        #ruler .tick-cm { top: 0; }
-        #ruler .tick-in { bottom: 0; }
-        #ruler .tick-cm.major { height: 16px; width: 1.5px; background: rgba(255,255,255,0.9); }
-        #ruler .tick-cm.half { height: 10px; }
-        #ruler .tick-cm.minor { height: 5px; background: rgba(255,255,255,0.5); }
-        #ruler .tick-in.major { height: 16px; width: 1.5px; background: rgba(255,255,255,0.9); }
-        #ruler .tick-in.half { height: 12px; }
-        #ruler .tick-in.quarter { height: 8px; }
-        #ruler .tick-in.eighth { height: 5px; background: rgba(255,255,255,0.5); }
-        #ruler .label {
-            position: absolute; font: 600 9px system-ui;
-            color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
-        #ruler .label-cm { top: 18px; transform: translateX(-50%); }
-        #ruler .label-in { bottom: 18px; transform: translateX(-50%); }
-        #ruler .unit-label {
-            position: absolute; font: 600 8px system-ui;
-            color: rgba(255,255,255,0.6); text-transform: uppercase;
-        }
-        #ruler .unit-cm { top: 18px; left: 8px; }
-        #ruler .unit-in { bottom: 18px; left: 8px; }
-        #ruler .drag-handle {
-            position: absolute; left: 50%; top: 50%;
-            transform: translate(-50%,-50%);
-            width: 36px; height: 36px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%; cursor: pointer; z-index: 10;
-            display: flex; align-items: center; justify-content: center;
-        }
-        #ruler .drag-handle::before { content: '⟲'; color: rgba(255,255,255,0.6); font-size: 18px; }
-        #ruler .rotate-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            width: 28px; height: 28px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%; color: rgba(255,255,255,0.75);
-            font-size: 12px; cursor: pointer; z-index: 10;
-            display: flex; align-items: center; justify-content: center;
-        }
-        #ruler .rotate-btn:active { background: rgba(255,255,255,0.3); }
-        #ruler .rot-l { left: calc(50% - 80px); }
-        #ruler .rot-r { left: calc(50% + 52px); }
-        #ruler .rot-90 { left: calc(50% + 100px); }
-        #ruler .angle-display {
-            position: absolute; top: -22px; left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.9);
-            padding: 2px 8px; border-radius: 8px; font: 600 10px system-ui;
+        /* Hide scroll nav on touch devices - they can scroll naturally */
+        @media (pointer: coarse) {
+            .scroll-nav { display: none !important; }
         }
         
-        #rulerToggle {
-            position: fixed; right: 14px; bottom: 14px; z-index: 9999;
-            padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3);
-            background: linear-gradient(180deg, rgba(200,220,255,0.9) 0%, rgba(140,180,240,0.85) 50%, rgba(100,150,220,0.9) 100%);
-            color: #1a3a5c; border-radius: 12px; font: 600 14px system-ui;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.5);
+        /* Fullscreen mode - hide controls until tapped */
+        :fullscreen .controls,
+        :fullscreen .toc-toggle,
+        :fullscreen .toc-sidebar,
+        :fullscreen .side-nav,
+        :fullscreen .scroll-nav,
+        :fullscreen .zoom-indicator {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
-        #rulerToggle:hover { background: linear-gradient(180deg, rgba(210,230,255,0.95) 0%, rgba(160,200,250,0.9) 50%, rgba(120,170,230,0.95) 100%); }
-        #rulerToggle.active { 
-            background: linear-gradient(180deg, rgba(100,200,150,0.9) 0%, rgba(60,180,120,0.85) 50%, rgba(40,150,100,0.9) 100%);
-            color: #0a3020;
+        :fullscreen.show-controls .controls,
+        :fullscreen.show-controls .toc-toggle,
+        :fullscreen.show-controls .side-nav,
+        :fullscreen.show-controls .scroll-nav,
+        :fullscreen.show-controls .zoom-indicator {
+            opacity: 1;
+            pointer-events: auto;
         }
+        :fullscreen .toc-sidebar { display: none; }
         
-        /* Drawing Tools */
-        #drawCanvas {
-            position: absolute;
-            pointer-events: none; z-index: 50;
-            image-rendering: auto;
+        /* Fullscreen info overlay */
+        #fsInfo {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 10000; color: #fff; text-align: center;
+            font-family: system-ui, sans-serif;
         }
-        #drawCanvas.active { pointer-events: auto; cursor: crosshair; }
-        
-        #drawToggle {
-            position: fixed; right: 14px; bottom: 70px; z-index: 9999;
-            padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3);
-            background: linear-gradient(180deg, rgba(255,220,180,0.9) 0%, rgba(255,180,120,0.85) 50%, rgba(240,150,80,0.9) 100%);
-            color: #5a3a1c; border-radius: 12px; font: 600 14px system-ui;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.5);
-        }
-        #drawToggle:hover { background: linear-gradient(180deg, rgba(255,230,200,0.95) 0%, rgba(255,200,150,0.9) 50%, rgba(250,170,100,0.95) 100%); }
-        #drawToggle.active { 
-            background: linear-gradient(180deg, rgba(100,200,150,0.9) 0%, rgba(60,180,120,0.85) 50%, rgba(40,150,100,0.9) 100%);
-            color: #0a3020;
-        }
-        
-        #drawPanel {
-            position: fixed; right: 70px; bottom: 14px; z-index: 9999;
-            background: #222; border: 1px solid #444; border-radius: 8px;
-            padding: 8px; display: none; flex-direction: column; gap: 6px;
-        }
-        #drawPanel.visible { display: flex; }
-        .draw-row { display: flex; gap: 4px; align-items: center; }
-        .draw-label { font-size: 10px; color: #888; width: 55px; }
-        .draw-btn {
-            width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent;
-            cursor: pointer; padding: 0;
-        }
-        .draw-btn:hover { border-color: #fff; }
-        .draw-btn.active { border-color: #0af; box-shadow: 0 0 6px #0af; }
-        .draw-btn.pen-red { background: #e53935; }
-        .draw-btn.pen-blue { background: #1e88e5; }
-        .draw-btn.pen-green { background: #43a047; }
-        .draw-btn.pen-black { background: #222; border-color: #666; }
-        .draw-btn.hl-yellow { background: rgba(255,235,59,0.7); }
-        .draw-btn.hl-green { background: rgba(76,175,80,0.5); }
-        .draw-btn.hl-blue { background: rgba(33,150,243,0.5); }
-        .draw-btn.hl-pink { background: rgba(233,30,99,0.5); }
-        #clearDraw {
-            background: #c62828; color: #fff; border: none; border-radius: 4px;
-            padding: 4px 8px; font-size: 11px; cursor: pointer; margin-top: 4px;
-        }
-        #clearDraw:hover { background: #e53935; }
+        #fsInfo.visible { display: flex; }
+        #fsInfo h2 { font-size: 24px; margin: 0 0 20px; font-weight: 600; }
+        #fsInfo .info-row { font-size: 14px; color: #aaa; margin: 4px 0; }
+        #fsInfo .info-row span { color: #fff; }
+        #fsInfo .hint { margin-top: 30px; font-size: 13px; color: #666; }
+        #fsInfo .hint strong { color: #888; }
         
         @media (max-width: 600px) {
             .controls { padding: 4px 6px; gap: 4px; }
@@ -443,41 +353,20 @@ def get_template():
 </div>
 
 <div class="zoom-indicator" id="zoomIndicator">100%</div>
+
+<!-- Fullscreen info overlay -->
+<div id="fsInfo">
+    <h2>__TITLE__</h2>
+    <div class="info-row">Page <span id="fsPage">1</span> of <span id="fsTotal">1</span></div>
+    <div class="info-row">build-comic.py v__VERSION__ | __DATE__</div>
+    <div class="hint">Tap anywhere to show controls<br><strong>Tap again</strong> or wait to hide</div>
+</div>
 <button class="side-nav prev" id="sidePrev">‹</button>
 <button class="side-nav next" id="sideNext">›</button>
 <button class="scroll-nav down" id="scrollDown">↓</button>
 <button class="scroll-nav up" id="scrollUp">↑</button>
 
-<!-- Ruler -->
-<button id="rulerToggle" title="Toggle Ruler">📏</button>
-<div id="ruler">
-    <div class="ruler-body" id="rulerBody"></div>
-    <button class="rotate-btn rot-l" id="rotL" title="-15°">↶</button>
-    <div class="drag-handle" id="rulerHandle"></div>
-    <button class="rotate-btn rot-r" id="rotR" title="+15°">↷</button>
-    <button class="rotate-btn rot-90" id="rot90" title="90°">⊥</button>
-    <div class="angle-display" id="angleDisplay">0°</div>
-</div>
 
-<!-- Drawing Tools -->
-<button id="drawToggle" title="Toggle Drawing">✏️</button>
-<div id="drawPanel">
-    <div class="draw-row">
-        <span class="draw-label">Pens</span>
-        <button class="draw-btn pen-red" data-tool="pen" data-color="#e53935" title="Red Pen"></button>
-        <button class="draw-btn pen-blue" data-tool="pen" data-color="#1e88e5" title="Blue Pen"></button>
-        <button class="draw-btn pen-green" data-tool="pen" data-color="#43a047" title="Green Pen"></button>
-        <button class="draw-btn pen-black" data-tool="pen" data-color="#222222" title="Black Pen"></button>
-    </div>
-    <div class="draw-row">
-        <span class="draw-label">Highlighters</span>
-        <button class="draw-btn hl-yellow" data-tool="hl" data-color="rgba(255,235,59,0.4)" title="Yellow Highlighter"></button>
-        <button class="draw-btn hl-green" data-tool="hl" data-color="rgba(76,175,80,0.4)" title="Green Highlighter"></button>
-        <button class="draw-btn hl-blue" data-tool="hl" data-color="rgba(33,150,243,0.4)" title="Blue Highlighter"></button>
-        <button class="draw-btn hl-pink" data-tool="hl" data-color="rgba(233,30,99,0.4)" title="Pink Highlighter"></button>
-    </div>
-    <button id="clearDraw">Clear Page</button>
-</div>
 
 <script>
 const CONFIG = __CONFIG__;
@@ -506,7 +395,6 @@ function loadPage(idx) {
     container.scrollTop = container.scrollLeft = 0;
     updateTOC();
     saveState();
-    if (window.redrawCanvas) setTimeout(window.redrawCanvas, 100);
 }
 
 function setFitMode(mode) {
@@ -523,13 +411,10 @@ function setFitMode(mode) {
 
 function updateTransform() {
     if (state.zoom === 1) {
-        img.style.transform = ''; img.style.width = ''; img.style.height = '';
+        img.style.transform = '';
         $('zoomIndicator').style.display = 'none';
     } else {
-        const w = img.naturalWidth * state.zoom;
-        const h = img.naturalHeight * state.zoom;
-        img.style.width = w + 'px'; img.style.height = h + 'px';
-        img.style.transform = `translate(${state.translateX}px, ${state.translateY}px)`;
+        img.style.transform = `scale(${state.zoom}) translate(${state.translateX}px, ${state.translateY}px)`;
         $('zoomIndicator').textContent = Math.round(state.zoom * 100) + '%';
         $('zoomIndicator').style.display = 'block';
     }
@@ -619,237 +504,6 @@ function toggleFullscreen() {
         document.exitFullscreen?.() || document.webkitExitFullscreen?.();
     }
 }
-
-// Ruler
-(function() {
-    const ruler = $('ruler'), body = $('rulerBody'), toggle = $('rulerToggle');
-    const handle = $('rulerHandle'), angleDisp = $('angleDisplay');
-    let visible = false, dragging = false, angle = 0, currentTop = null;
-    let dragStartY = 0, rulerStartTop = 0, pxPerMm = null;
-
-    function updateTransform() {
-        if (currentTop !== null) {
-            ruler.style.top = currentTop + 'px';
-            ruler.style.transform = `rotate(${angle}deg)`;
-        } else {
-            ruler.style.transform = `translateY(-50%) rotate(${angle}deg)`;
-        }
-        angleDisp.textContent = angle + '°';
-    }
-
-    function drawTicks() {
-        if (!pxPerMm) pxPerMm = window.innerWidth / 210;
-        body.innerHTML = '';
-        const width = window.innerWidth * 1.5;
-        const pxPerCm = pxPerMm * 10, pxPerInch = pxPerMm * 25.4;
-        
-        // Unit labels
-        body.innerHTML += '<div class="unit-label unit-cm">cm</div><div class="unit-label unit-in">in</div>';
-        
-        // CM ticks
-        for (let mm = 0; mm * pxPerMm < width; mm++) {
-            const x = mm * pxPerMm;
-            let cls = 'tick tick-cm';
-            if (mm % 10 === 0) { cls += ' major'; if (mm > 0) body.innerHTML += `<div class="label label-cm" style="left:${x}px">${mm/10}</div>`; }
-            else if (mm % 5 === 0) cls += ' half';
-            else cls += ' minor';
-            body.innerHTML += `<div class="${cls}" style="left:${x}px"></div>`;
-        }
-        
-        // Inch ticks
-        for (let e = 0; e * (pxPerInch/8) < width; e++) {
-            const x = e * (pxPerInch/8);
-            let cls = 'tick tick-in';
-            if (e % 8 === 0) { cls += ' major'; if (e > 0) body.innerHTML += `<div class="label label-in" style="left:${x}px">${e/8}</div>`; }
-            else if (e % 4 === 0) cls += ' half';
-            else if (e % 2 === 0) cls += ' quarter';
-            else cls += ' eighth';
-            body.innerHTML += `<div class="${cls}" style="left:${x}px"></div>`;
-        }
-    }
-
-    function show() {
-        visible = true; angle = 0; currentTop = null;
-        ruler.style.top = '50%'; ruler.style.display = 'block';
-        toggle.classList.add('active'); updateTransform(); drawTicks();
-    }
-    function hide() { visible = false; ruler.style.display = 'none'; toggle.classList.remove('active'); }
-
-    toggle.onclick = () => visible ? hide() : show();
-    handle.onclick = () => { angle = 0; updateTransform(); };
-    handle.ondblclick = () => { currentTop = null; ruler.style.top = '50%'; updateTransform(); };
-    $('rotL').onclick = e => { e.stopPropagation(); angle -= 15; updateTransform(); };
-    $('rotR').onclick = e => { e.stopPropagation(); angle += 15; updateTransform(); };
-    $('rot90').onclick = e => { e.stopPropagation(); angle = (angle === 90) ? 0 : 90; updateTransform(); };
-
-    ruler.onmousedown = e => {
-        if (e.target.tagName === 'BUTTON') return;
-        dragging = true; ruler.classList.add('dragging');
-        dragStartY = e.clientY;
-        const rect = ruler.getBoundingClientRect();
-        rulerStartTop = rect.top + rect.height / 2;
-        e.preventDefault();
-    };
-    window.onmousemove = e => {
-        if (!dragging) return;
-        currentTop = Math.max(28, Math.min(window.innerHeight - 28, rulerStartTop + e.clientY - dragStartY));
-        updateTransform();
-    };
-    window.onmouseup = () => { dragging = false; ruler.classList.remove('dragging'); };
-
-    // Touch
-    ruler.ontouchstart = e => {
-        if (e.target.tagName === 'BUTTON') return;
-        dragging = true; ruler.classList.add('dragging');
-        dragStartY = e.touches[0].clientY;
-        const rect = ruler.getBoundingClientRect();
-        rulerStartTop = rect.top + rect.height / 2;
-        e.preventDefault();
-    };
-    window.ontouchmove = e => {
-        if (!dragging) return;
-        currentTop = Math.max(28, Math.min(window.innerHeight - 28, rulerStartTop + e.touches[0].clientY - dragStartY));
-        updateTransform();
-    };
-    window.ontouchend = () => { dragging = false; ruler.classList.remove('dragging'); };
-
-    window.addEventListener('resize', () => { if (visible) drawTicks(); });
-    img.onload = () => { if (visible) drawTicks(); };
-})();
-
-// Drawing Tools
-(function() {
-    let canvas, ctx;
-    let drawing = false, drawActive = false;
-    let currentTool = 'pen', currentColor = '#e53935';
-    const drawings = {}; // Store drawings per page
-    
-    function createCanvas() {
-        if (canvas) return;
-        canvas = document.createElement('canvas');
-        canvas.id = 'drawCanvas';
-        container.appendChild(canvas);
-        ctx = canvas.getContext('2d');
-        resizeCanvas();
-    }
-    
-    function resizeCanvas() {
-        if (!canvas || !img.complete || !img.naturalWidth) return;
-        const imgRect = img.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        
-        // Position canvas exactly over the image
-        canvas.style.position = 'absolute';
-        canvas.style.left = (imgRect.left - containerRect.left + container.scrollLeft) + 'px';
-        canvas.style.top = (imgRect.top - containerRect.top + container.scrollTop) + 'px';
-        canvas.style.width = imgRect.width + 'px';
-        canvas.style.height = imgRect.height + 'px';
-        
-        // Set canvas resolution to match display size
-        canvas.width = imgRect.width;
-        canvas.height = imgRect.height;
-        
-        redraw();
-    }
-    
-    function saveDrawing() {
-        if (!canvas) return;
-        drawings[state.page] = canvas.toDataURL();
-    }
-    
-    function redraw() {
-        if (!ctx || !canvas) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (drawings[state.page]) {
-            const img2 = new Image();
-            img2.onload = () => ctx.drawImage(img2, 0, 0, canvas.width, canvas.height);
-            img2.src = drawings[state.page];
-        }
-    }
-    
-    function getPos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-    
-    function startDraw(e) {
-        if (!drawActive) return;
-        drawing = true;
-        const pos = getPos(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-        ctx.strokeStyle = currentColor;
-        ctx.lineWidth = currentTool === 'pen' ? 2 : 20;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        if (currentTool === 'hl') ctx.globalCompositeOperation = 'multiply';
-        else ctx.globalCompositeOperation = 'source-over';
-    }
-    
-    function draw(e) {
-        if (!drawing) return;
-        e.preventDefault();
-        const pos = getPos(e);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-    }
-    
-    function endDraw() {
-        if (drawing) { drawing = false; saveDrawing(); }
-    }
-    
-    function toggleDraw(active) {
-        drawActive = active !== undefined ? active : !drawActive;
-        $('drawToggle').classList.toggle('active', drawActive);
-        $('drawPanel').classList.toggle('visible', drawActive);
-        if (drawActive) {
-            createCanvas();
-            canvas.classList.add('active');
-            resizeCanvas();
-        } else if (canvas) {
-            canvas.classList.remove('active');
-        }
-    }
-    
-    function selectTool(btn) {
-        document.querySelectorAll('.draw-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentTool = btn.dataset.tool;
-        currentColor = btn.dataset.color;
-    }
-    
-    function clearPage() {
-        if (!ctx) return;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        delete drawings[state.page];
-    }
-    
-    // Events
-    $('drawToggle').onclick = () => toggleDraw();
-    $('clearDraw').onclick = clearPage;
-    document.querySelectorAll('.draw-btn').forEach(btn => {
-        btn.onclick = () => selectTool(btn);
-    });
-    
-    // Drawing events (delegated to window for canvas)
-    container.addEventListener('mousedown', e => { if (e.target === canvas) startDraw(e); });
-    window.addEventListener('mousemove', draw);
-    window.addEventListener('mouseup', endDraw);
-    container.addEventListener('touchstart', e => { if (e.target === canvas) startDraw(e); }, { passive: false });
-    window.addEventListener('touchmove', e => { if (drawing) draw(e); }, { passive: false });
-    window.addEventListener('touchend', endDraw);
-    
-    // Resize canvas on image load or resize
-    img.addEventListener('load', () => setTimeout(resizeCanvas, 100));
-    window.addEventListener('resize', () => setTimeout(resizeCanvas, 100));
-    container.addEventListener('scroll', () => { if (canvas) resizeCanvas(); });
-    
-    // Expose redraw for page changes
-    window.redrawCanvas = () => { resizeCanvas(); redraw(); };
-    window.resizeDrawCanvas = resizeCanvas;
-})();
 
 // Events
 $('tocToggle').onclick = () => toggleTOC();
@@ -1001,11 +655,9 @@ def build(folder):
     print(f"  TOC: {'Yes' if toc else 'No'}")
     print(f"  Output: index.html")
     print()
-    print("Tools:")
-    print("  📏 Ruler       Drag to position, rotate buttons")
-    print("  ✏️ Draw        Pens (R/B/G/K) + Highlighters (Y/G/B/P)")
-    print()
     print("Navigation:")
+    print("  ‹ ›           Page prev/next (side buttons)")
+    print("  ↑ ↓           Scroll up/down (desktop, fit-width)")
     print("  ← → keys      Page prev/next (pan when zoomed)")
     print("  Ctrl+Scroll   Zoom in/out")
     print("  H / W         Fit height / width")
