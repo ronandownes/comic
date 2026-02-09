@@ -1,0 +1,20 @@
+# ── Source captures (large, regenerable) ──
+raw/
+
+# ── Generated / intermediate ──
+toc-jpegs/
+webp/
+
+# ── Build output ──
+index.html
+
+# ── OS / editor junk ──
+.DS_Store
+Thumbs.db
+*.pyc
+__pycache__/
+
+# ── Temp / duplicates ──
+folder_size.txt
+structure.txt
+*.bak

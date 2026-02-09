@@ -1,0 +1,467 @@
+# Beast Academy Comic - Table of Contents
+# =========================================================
+# Format:  CH B-CC | chapter name
+#          page | section name | LO codes
+# Page = capture number -> file B-CC-PP.webp
+# Source: Visual plaque detection from corner crops
+#
+# JC LO codes: N.x GT.x AF.x SP.x U.x  (* = HL-only)
+# =========================================================
+
+  CH 1-01 | Counting
+    03 | First Day | N.1
+    09 | Campus Tour | N.1
+    15 | One Hundred | N.1
+
+  CH 1-02 | Shapes
+    03 | Names | GT.5
+    09 | Spins & Flips | GT.20,GT.21
+    16 | Apart & Together
+
+  CH 1-03 | Comparing
+    03 | One for One | N.4
+    11 | More or Less | N.4
+    19 | Lengths | N.20
+    25 | The Beginning
+
+  CH 1-04 | Addition
+    03 | Addition | N.3
+    05 | + & = | N.3
+    13 | Strategies | N.3,U.1
+    21 | Ten | N.3
+
+  CH 1-05 | Subtraction
+    03 | Taking Away | N.3
+    09 | Difference | N.3
+    17 | Strategies | N.3,U.1
+
+  CH 1-06 | Categories
+    03 | Odd One Out | U.5
+    07 | Categories | SP.7
+    15 | Circle Diagrams | SP.7
+
+  CH 1-07 | Addition & Subtraction
+    03 | Review | N.3
+    09 | The Number Line | N.1
+    17 | Ten | N.3
+    21 | Tens & Ones | N.1
+
+  CH 1-08 | Comparing
+    03 | Comparing | N.4
+    06 | Expressions | AF.2
+    15 | Comparing Differences | N.4
+    23 | Tricks | N.3,U.1
+
+  CH 1-09 | Patterns
+    03 | Shape Patterns | AF.13
+    09 | Number Patterns | AF.13,AF.14
+    15 | Special Patterns | AF.14
+
+  CH 1-10 | Big Numbers
+    03 | Beyond 100 | N.1
+    07 | Counting Up | N.3
+    13 | Blocks | N.1
+    19 | Apart | N.1
+
+  CH 1-11 | Measurement
+    03 | Comparing Lengths | N.20
+    09 | Length | N.20
+    17 | Days | N.20
+    21 | Clocks | N.20
+
+  CH 1-12 | Problem Solving
+    03 | Location | GT.13
+    09 | Directions | GT.13
+    15 | Turns | GT.5
+    17 | Order | U.1
+
+  CH 2-01 | Place Value
+    03 | First Day | N.1
+    05 | Pirate Numbers | N.1
+    13 | Ones, Tens, Hundreds | N.1
+    19 | Regrouping & Breaking | N.1
+
+  CH 2-02 | Comparing
+    03 | The Number Line | N.1,N.4
+    09 | Distance Between | N.4
+    17 | Comparing | N.4
+    21 | Ordering | N.4
+
+  CH 2-03 | Addition
+    03 | Sums | N.3
+    09 | Strategies | N.3,U.1
+    15 | A Little Extra | N.3,U.1
+    21 | Rearranging | N.3
+
+  CH 2-04 | Subtraction
+    03 | Taking Away | N.3
+    09 | + & - | N.3
+    13 | Counting Up | N.3
+    20 | A Little Extra | N.3,U.1
+    24 | Alex's Notes | N.3
+    25 | Order | N.3
+
+  CH 2-05 | Expressions
+    03 | Expressions | AF.2
+    09 | Lunch | AF.2
+    15 | Symbols | AF.2
+    19 | Simplifying | AF.3
+    25 | Variables | AF.8
+    27 | Equations | AF.8
+
+  CH 2-06 | Problem Solving
+    03 | Guessing | U.1,AF.7
+    07 | Pirates | U.1
+    12 | Drawing | U.5
+    19 | Math Meet | U.1
+
+  CH 2-07 | Measurement
+    03 | Measurement | N.20
+    10 | Rulers | N.20
+    16 | Grogg's Notes | N.20
+    17 | From Inches to Miles | N.20
+    23 | Mixed Measures | N.20
+
+  CH 2-08 | Strategies (+ & -)
+    03 | Adding and Subtracting | N.3
+    10 | Zero-Sum Game | N.3
+    11 | Evaluating Expressions | AF.2
+    19 | Parentheses | AF.2
+    24 | Skip-Counting | N.3
+
+  CH 2-09 | Odds & Evens
+    03 | Odd & Even | N.1
+    09 | More Than Two | N.1
+    17 | Crossings | U.1
+    23 | Coins | U.1
+    27 | Checkerboards | U.1
+
+  CH 2-10 | Big Numbers
+    03 | Thousands and Beyond | N.1
+    10 | Grogg's Notes | N.1
+    11 | Computing | N.3
+    17 | Comparing | N.4
+    20 | Estimation | N.17,N.18
+    27 | Infinity | N.1
+
+  CH 2-11 | Algorithms (+ & -)
+    03 | Algorithms | N.3
+    07 | Stacking | N.3
+    17 | More Than Two | N.3
+    19 | Stacking Subtraction | N.3
+    25 | Cryptarithms | U.1,AF.1
+
+  CH 2-12 | Problem Solving
+    03 | Counting Paths | U.1
+    09 | Organizing | U.1,U.5
+    16 | Finding a Pattern | U.1,AF.13
+    21 | Math Meet | U.1
+
+  CH 3-01 | Shapes
+    03 | Angles | GT.5
+    07 | Triangles | GT.6,GT.8
+    14 | Don't Make a Triangle | GT.8
+    15 | Quadrilaterals | GT.6
+    22 | Grogg's Notes | GT.5
+    23 | Polyominoes | U.1
+
+  CH 3-02 | Skip-Counting
+    03 | Skip-Counting | N.3,N.5
+    09 | Hundred Charts | N.1,N.5
+    15 | Balance | U.1,N.5
+    21 | The 100 Game | N.3
+
+  CH 3-03 | Perimeter & Area
+    03 | Perimeter and Area | N.20,N.21
+    09 | Perimeter | N.20
+    12 | Rectilinear Shapes | N.21
+    22 | Math Meet | U.1
+    23 | Area | N.21
+    28 | Lizzie's Notes | N.21
+    31 | Rep-Tiles | U.1
+
+  CH 3-04 | Multiplication
+    03 | St. Ives | N.5
+    04 | The Times Table | N.5
+    10 | The Commutative Property | N.5
+    15 | Block Blob | N.5
+    17 | Multiplying Big Numbers | N.5
+    22 | The Associative Property | N.5
+    26 | Multiplying by 4 and by 5 | N.5,U.1
+    28 | Winnie's Notes | N.5
+    32 | Penny Rows | U.1
+    34 | Grogg's Notes | U.1
+
+  CH 3-05 | Perfect Squares
+    03 | Perfect Squares | N.5,AF.14
+    07 | Squares that End in 5 | N.5,U.1
+    15 | Squaring Up | N.5,AF.14
+    17 | Winnie's Notes | AF.14
+    19 | Dots and Boxes | U.1
+    23 | In the Garden | AF.14
+    24 | Dissections | U.1
+    24 | Alex's Notes | U.1
+
+  CH 3-06 | The Distributive Property
+    03 | Order of Operations | N.3,AF.2
+    07 | Big Rectangles | N.5,N.21
+    11 | Pirate Booty | N.5,AF.4
+    16 | The Distributive Property | AF.4
+    20 | Math Meet | U.1
+
+  CH 3-07 | Variables
+    03 | The Number 7 | AF.1
+    06 | Variables | AF.1
+    11 | Winnie's Notes | AF.3
+    13 | Writing Equations | AF.7
+    17 | Lizzie's Notes | AF.7
+    18 | Solving Equations | AF.7,AF.8
+    25 | Wild Tic-tac-toe | U.1
+    28 | Capsules | U.1,AF.7
+
+  CH 3-08 | Division
+    03 | Sharing | N.6
+    09 | × and ÷ | N.5,N.6
+    12 | Leftovers | N.6
+    19 | Lizzie's Notes | N.6
+    20 | Remainders | N.6
+    24 | Teamwork | N.6,U.1
+    27 | Nim | U.1
+
+  CH 3-09 | Measurement
+    03 | Flossie | N.20
+    05 | Units | N.20
+    07 | Customary Units | N.20
+    14 | Lizzie's Notes | N.20
+    17 | Carpool | N.20
+    21 | The Metric System | N.20
+    31 | Math Meet | U.1
+    32 | Alex's Notes | N.20
+    35 | Proper Measurin' | N.20
+
+  CH 3-10 | Fractions
+    03 | One-Eighth | N.7
+    06 | Unit Fractions | N.7
+    10 | Whole-Number Fractions | N.7
+    15 | Equal Fractions | N.7
+    18 | Mixed Numbers | N.7
+    23 | Parts of a Whole | N.7
+    28 | Equivalent Fractions | N.7,N.8
+    34 | Comparing Fractions | N.7,N.4
+    37 | Alex's Notes | N.7
+
+  CH 3-11 | Estimation
+    03 | Close Enough | N.17,N.18
+    06 | Rounding | N.17
+    11 | Over and Underestimating | N.18
+    15 | Quotients | N.6,N.18
+    17 | Handprint Area | N.21,N.18
+    19 | Guesstimate | N.18
+
+  CH 3-12 | Area
+    03 | Measuring Area | N.21
+    08 | Square Units | N.21
+    13 | Lizzie's Scrapbook | N.21
+    16 | Right Triangles | N.21,GT.6
+    20 | Triangle Area | N.21
+    28 | Math Meet | U.1
+
+  CH 4-01 | Shapes
+    03 | Definitions | GT.5
+    08 | Measuring Angles | GT.5
+    14 | Parallel and Perpendicular | GT.4,GT.7
+    20 | Symmetry | GT.20,GT.21
+    22 | Carronade | GT.13
+    24 | Grogg's Notes | GT.21
+
+  CH 4-02 | Multiplication
+    03 | One Part at a Time | N.5,AF.4
+    09 | The Algorithm | N.5
+    15 | The Units Digit | N.5,U.1
+    19 | Lab | N.5
+    23 | 1's and 0's | N.5
+
+  CH 4-03 | Exponents
+    03 | Exponents | N.13
+    08 | Lizzie's Notes | N.13
+    09 | Order of Operations | N.3,AF.2
+    13 | Power Play | N.13
+    18 | Perfect Squares | N.13,AF.14
+    25 | Math Meet | U.1
+    26 | Binary Island | N.1,N.13
+    32 | Base-2 | N.1,N.13
+    36 | Grogg's Notes | U.1
+
+  CH 4-04 | Counting
+    03 | Counting | U.1
+    08 | Choices | U.1
+    12 | Venn Diagrams | SP.7
+    17 | Factorials | N.5,U.1
+    25 | Alex's Notes | U.1
+    30 | Counting Pairs | U.1
+    32 | Lizzie's Notes | U.1
+
+  CH 4-05 | Division
+    03 | Special Quotients | N.6
+    08 | Multiples of Ten | N.6
+    16 | Long Division | N.6
+    20 | Carpool | N.6,U.1
+    23 | Divisibility | N.6
+
+  CH 4-06 | Logic
+    03 | Logic Puzzles | U.1,U.2
+    08 | Bon Voyage | U.1
+    15 | Grid Puzzles | U.1,U.2
+    23 | Code Breaker | U.1
+    26 | Truth-tellers and Liars | U.1,U.2
+    29 | The Math Bowl | U.1
+
+  CH 4-07 | Factors
+    03 | Factors | N.2,N.6
+    11 | The Sieve | N.2
+    21 | Fizz Buzz | N.2,N.6
+    29 | Divisibility | N.6
+    32 | Prime Factorization | N.2
+
+  CH 4-08 | Fractions (+ & -)
+    03 | Review | N.7
+    09 | Adding Fractions | N.8
+    11 | Mixed Numbers | N.8
+    17 | Rummy | N.8
+    21 | Adding Mixed Numbers | N.8
+    26 | Story Problem | N.8,U.1
+    27 | Fraction Subtraction | N.8
+    28 | Mental Math | N.8,U.1
+
+  CH 4-09 | Integers
+    03 | Negatives | N.1,N.3
+    05 | Less Than Zero | N.1,N.4
+    10 | Adding Integers | N.3
+    17 | Grogg's Notes | N.1
+    23 | Subtracting Integers | N.3
+    28 | Rearranging | N.3,AF.3
+    30 | Lizzie's Notes | N.3
+
+  CH 4-10 | Fractions (× & ÷)
+    03 | Of | N.9
+    06 | Multiplying Fractions | N.9
+    11 | Multiplying by a Fraction | N.9
+    16 | Mixed Numbers | N.9
+    21 | Story Problem | N.9,U.1
+    23 | Division | N.9
+
+  CH 4-11 | Decimals
+    03 | Decimals | N.1,N.7
+    08 | Reading Decimals | N.7
+    13 | Comparing Decimals | N.4,N.7
+    25 | Lunch | N.7
+    32 | Alex's Notes | N.7
+    32 | Adding and Subtracting | N.8
+    32 | Paid Advertisement | U.1
+
+  CH 4-12 | Probability
+    03 | Chance | SP.1,SP.2
+    08 | Computing Probability | SP.3
+    15 | Grogg's Notes | SP.3
+    21 | Coins and Dice | SP.3,SP.4
+    25 | Flip | SP.4
+    33 | Math Relays: Round 1 | SP.3
+    35 | Channel 5
+    37 | Math Relays: The Finals
+
+  CH 5-01 | 3D Solids
+    03 | 3D | N.22
+    07 | Solids | N.22
+    13 | Grogg's Notes | N.22
+    15 | Nets | N.22
+    21 | Surface Area | N.23
+    29 | Alex's Notes | N.22
+    31 | Volume | N.24
+
+  CH 5-02 | Integers
+    03 | Review | N.1,N.3
+    06 | Lunch | N.1
+    15 | Multiplying Integers | N.5
+    19 | Winnie's Homework | N.5
+    23 | Carpool | N.5
+    24 | Dividing Integers | N.6
+    25 | Exponents | N.13
+    26 | Lizzie's Notes | N.13,N.14
+
+  CH 5-03 | Expressions & Equations
+    03 | Notation | AF.1
+    09 | Simplifying | AF.3
+    15 | Isolating x | AF.8
+    20 | Solving Equations | AF.8
+    24 | Carpool | AF.8,U.1
+    27 | Math Meet | U.1
+
+  CH 5-04 | Statistics
+    03 | The Middle | SP.14,SP.15
+    09 | Average | SP.14
+    16 | Averaging | SP.14
+    23 | Range & Mode | SP.15
+    26 | Stat Stumped | SP.14,SP.15
+
+  CH 5-05 | Factors & Multiples
+    03 | Factors | N.2,N.6
+    09 | GCF | N.2
+    17 | GCF3All | N.2
+    25 | LCM | N.2
+    26 | Grogg's Notes | N.2
+    30 | Factorials | N.5
+
+  CH 5-06 | Fractions
+    03 | Addition & Subtraction | N.8
+    09 | Multiplication | N.9
+    13 | More Multiplication | N.9
+    21 | Cancelling | N.9
+    22 | Training | N.9,U.1
+    25 | Channel 5
+    28 | The Final Round
+
+  CH 5-07 | Sequences
+    03 | Next | AF.13
+    09 | Sequences | AF.13,AF.14
+    17 | Subtractionacci | AF.14
+    24 | Arithmetic Sequences | AF.15
+    27 | Triangular Numbers | AF.14
+
+  CH 5-08 | Ratios & Rates
+    03 | Ratios | N.9,N.10
+    11 | Proportions | N.10
+    17 | Rates | N.10
+    24 | Unit Conversions | N.20
+
+  CH 5-09 | Decimals
+    03 | Tens & Tenths | N.7,N.13
+    09 | Multiplying Decimals | N.9
+    14 | Conversions | N.7,N.10
+    19 | Dividing Decimals | N.9
+    24 | Math Meet | U.1
+
+  CH 5-10 | Percents
+    03 | Percents & Fractions | N.10
+    08 | Percents & Decimals | N.10
+    13 | Percent of a Number | N.10
+    17 | Finding Percents | N.10
+    22 | Proportions | N.10,N.11
+    25 | Brain-Baffling | N.10
+
+  CH 5-11 | Square Roots
+    03 | Square Roots | N.13,AF.14
+    08 | Lizzie's Notes | N.13
+    09 | Estimation | N.18
+    17 | More or Less | N.13
+    25 | Tricky Square Roots | N.13
+    28 | The Pythagorean Theorem | GT.9*
+
+  CH 5-12 | Exponents
+    03 | Exponents | N.13,N.14
+    09 | Negative Exponents | N.14
+    13 | Pneumatube | N.14
+    15 | The WMOC | U.1
+    19 | Channel 5
+    23 | The Finals
+
+# Total: 336 sections, 307 plaque-confirmed, 29 interpolated

@@ -1,0 +1,478 @@
+[
+  {
+    "book": 1, "name": "Beast Academy 1",
+    "chapters": [
+      {"number": 1, "name": "Counting", "toc": "1-01-01", "sections": [
+        {"name": "First Day", "page": "1-01-14"},
+        {"name": "Campus Tour", "page": "1-01-26"},
+        {"name": "One Hundred", "page": "1-01-44"}
+      ]},
+      {"number": 2, "name": "Shapes", "toc": "1-02-01", "sections": [
+        {"name": "Names", "page": "1-02-68"},
+        {"name": "Spins & Flips", "page": "1-02-84"},
+        {"name": "Apart & Together", "page": "1-02-106"}
+      ]},
+      {"number": 3, "name": "Comparing", "toc": "1-03-01", "sections": [
+        {"name": "One for One", "page": "1-03-122"},
+        {"name": "More or Less", "page": "1-03-124"},
+        {"name": "Lengths", "page": "1-03-142"},
+        {"name": "The Beginning", "page": "1-03-162"}
+      ]},
+      {"number": 4, "name": "Addition", "toc": "1-04-01", "sections": [
+        {"name": "Addition", "page": "1-04-14"},
+        {"name": "Strategies", "page": "1-04-18"},
+        {"name": "Ten", "page": "1-04-34"}
+      ]},
+      {"number": 5, "name": "Subtraction", "toc": "1-05-01", "sections": [
+        {"name": "Taking Away", "page": "1-05-84"},
+        {"name": "Difference", "page": "1-05-106"},
+        {"name": "Strategies", "page": "1-05-126"}
+      ]},
+      {"number": 6, "name": "Categories", "toc": "1-06-01", "sections": [
+        {"name": "Odd One Out", "page": "1-06-148"},
+        {"name": "Categories", "page": "1-06-162"},
+        {"name": "Circle Diagrams", "page": "1-06-178"}
+      ]},
+      {"number": 7, "name": "Addition & Subtraction", "toc": "1-07-01", "sections": [
+        {"name": "Review", "page": "1-07-14"},
+        {"name": "The Number Line", "page": "1-07-28"},
+        {"name": "Tens & Ones", "page": "1-07-50"}
+      ]},
+      {"number": 8, "name": "Comparing", "toc": "1-08-01", "sections": [
+        {"name": "Comparing", "page": "1-08-82"},
+        {"name": "Expressions", "page": "1-08-100"},
+        {"name": "Comparing Differences", "page": "1-08-120"},
+        {"name": "Tricks", "page": "1-08-142"}
+      ]},
+      {"number": 9, "name": "Patterns", "toc": "1-09-01", "sections": [
+        {"name": "Shape Patterns", "page": "1-09-150"},
+        {"name": "Number Patterns", "page": "1-09-152"},
+        {"name": "Special Patterns", "page": "1-09-168"}
+      ]},
+      {"number": 10, "name": "Big Numbers", "toc": "1-10-01", "sections": [
+        {"name": "Beyond 100", "page": "1-10-14"},
+        {"name": "Counting Up", "page": "1-10-30"},
+        {"name": "Blocks", "page": "1-10-46"},
+        {"name": "Apart", "page": "1-10-62"}
+      ]},
+      {"number": 11, "name": "Measurement", "toc": "1-11-01", "sections": [
+        {"name": "Comparing Lengths", "page": "1-11-70"},
+        {"name": "Length", "page": "1-11-72"},
+        {"name": "Days", "page": "1-11-88"},
+        {"name": "Clocks", "page": "1-11-112"}
+      ]},
+      {"number": 12, "name": "Problem Solving", "toc": "1-12-01", "sections": [
+        {"name": "Location", "page": "1-12-136"},
+        {"name": "Directions", "page": "1-12-138"},
+        {"name": "Turns", "page": "1-12-152"},
+        {"name": "Order", "page": "1-12-166"}
+      ]}
+    ]
+  },
+  {
+    "book": 2, "name": "Beast Academy 2",
+    "chapters": [
+      {"number": 1, "name": "Place Value", "toc": "2-01-01", "sections": [
+        {"name": "First Day", "page": "2-01-12"},
+        {"name": "Pirate Numbers", "page": "2-01-14"},
+        {"name": "Ones, Tens, Hundreds", "page": "2-01-16"},
+        {"name": "Regrouping & Breaking", "page": "2-01-24"}
+      ]},
+      {"number": 2, "name": "Comparing", "toc": "2-02-01", "sections": [
+        {"name": "The Number Line", "page": "2-02-40"},
+        {"name": "Distance Between", "page": "2-02-42"},
+        {"name": "Tago", "page": "2-02-48"},
+        {"name": "Comparing", "page": "2-02-55"},
+        {"name": "Ordering", "page": "2-02-56"}
+      ]},
+      {"number": 3, "name": "Addition", "toc": "2-03-01", "sections": [
+        {"name": "Sums", "page": "2-03-68"},
+        {"name": "Strategies", "page": "2-03-70"},
+        {"name": "A Little Extra", "page": "2-03-76"},
+        {"name": "Rearranging", "page": "2-03-82"}
+      ]},
+      {"number": 4, "name": "Subtraction", "toc": "2-04-01", "sections": [
+        {"name": "Taking Away", "page": "2-04-12"},
+        {"name": "+ & -", "page": "2-04-14"},
+        {"name": "Counting Up", "page": "2-04-20"},
+        {"name": "A Little Extra", "page": "2-04-24"},
+        {"name": "Alex's Notes", "page": "2-04-35"},
+        {"name": "Order", "page": "2-04-36"}
+      ]},
+      {"number": 5, "name": "Expressions", "toc": "2-05-01", "sections": [
+        {"name": "Expressions", "page": "2-05-42"},
+        {"name": "Lunch", "page": "2-05-44"},
+        {"name": "Symbols", "page": "2-05-50"},
+        {"name": "Simplifying", "page": "2-05-55"},
+        {"name": "Equations", "page": "2-05-60"}
+      ]},
+      {"number": 6, "name": "Problem Solving", "toc": "2-06-01", "sections": [
+        {"name": "Guessing", "page": "2-06-74"},
+        {"name": "Pirates", "page": "2-06-76"},
+        {"name": "Drawing", "page": "2-06-80"},
+        {"name": "Math Meet", "page": "2-06-85"}
+      ]},
+      {"number": 7, "name": "Measurement", "toc": "2-07-01", "sections": [
+        {"name": "Measurement", "page": "2-07-12"},
+        {"name": "Rulers", "page": "2-07-14"},
+        {"name": "Grogg's Notes", "page": "2-07-21"},
+        {"name": "From Inches to Miles", "page": "2-07-27"},
+        {"name": "Mixed Measures", "page": "2-07-28"}
+      ]},
+      {"number": 8, "name": "Strategies (+ & -)", "toc": "2-08-01", "sections": [
+        {"name": "Adding and Subtracting", "page": "2-08-42"},
+        {"name": "Zero-Sum Game", "page": "2-08-44"},
+        {"name": "Evaluating Expressions", "page": "2-08-51"},
+        {"name": "Parentheses", "page": "2-08-52"},
+        {"name": "Skip-Counting", "page": "2-08-60"}
+      ]},
+      {"number": 9, "name": "Odds & Evens", "toc": "2-09-01", "sections": [
+        {"name": "Odd & Even", "page": "2-09-70"},
+        {"name": "More Than Two", "page": "2-09-72"},
+        {"name": "Crossings", "page": "2-09-78"},
+        {"name": "Coins", "page": "2-09-86"},
+        {"name": "Checkerboards", "page": "2-09-92"}
+      ]},
+      {"number": 10, "name": "Big Numbers", "toc": "2-10-01", "sections": [
+        {"name": "Thousands and Beyond", "page": "2-10-12"},
+        {"name": "Grogg's Notes", "page": "2-10-14"},
+        {"name": "Computing", "page": "2-10-21"},
+        {"name": "Comparing", "page": "2-10-22"},
+        {"name": "Estimation", "page": "2-10-28"},
+        {"name": "Infinity", "page": "2-10-31"}
+      ]},
+      {"number": 11, "name": "Algorithms (+ & -)", "toc": "2-11-01", "sections": [
+        {"name": "Algorithms", "page": "2-11-40"},
+        {"name": "Stacking", "page": "2-11-42"},
+        {"name": "More Than Two", "page": "2-11-45"},
+        {"name": "Stacking Subtraction", "page": "2-11-54"},
+        {"name": "Cryptarithms", "page": "2-11-58"}
+      ]},
+      {"number": 12, "name": "Problem Solving", "toc": "2-12-01", "sections": [
+        {"name": "Counting Paths", "page": "2-12-74"},
+        {"name": "Organizing", "page": "2-12-76"},
+        {"name": "Finding a Pattern", "page": "2-12-82"},
+        {"name": "Math Meet", "page": "2-12-89"}
+      ]}
+    ]
+  },
+  {
+    "book": 3, "name": "Beast Academy 3",
+    "chapters": [
+      {"number": 1, "name": "Shapes", "toc": "3-01-01", "sections": [
+        {"name": "Angles", "page": "3-01-12"},
+        {"name": "Triangles", "page": "3-01-14"},
+        {"name": "Don't Make a Triangle", "page": "3-01-18"},
+        {"name": "Quadrilaterals", "page": "3-01-25"},
+        {"name": "Grogg's Notes", "page": "3-01-26"},
+        {"name": "Polyominoes", "page": "3-01-34"}
+      ]},
+      {"number": 2, "name": "Skip-Counting", "toc": "3-02-01", "sections": [
+        {"name": "Skip-Counting", "page": "3-02-42"},
+        {"name": "Hundred Charts", "page": "3-02-44"},
+        {"name": "Balance", "page": "3-02-56"},
+        {"name": "The 100 Game", "page": "3-02-65"}
+      ]},
+      {"number": 3, "name": "Perimeter & Area", "toc": "3-03-01", "sections": [
+        {"name": "Perimeter and Area", "page": "3-03-68"},
+        {"name": "Perimeter", "page": "3-03-74"},
+        {"name": "Rectilinear Shapes", "page": "3-03-77"},
+        {"name": "Math Meet", "page": "3-03-79"},
+        {"name": "Area", "page": "3-03-87"},
+        {"name": "Lizzie's Notes", "page": "3-03-91"},
+        {"name": "Rep-Tiles", "page": "3-03-93"}
+      ]},
+      {"number": 4, "name": "Multiplication", "toc": "3-04-01", "sections": [
+        {"name": "St. Ives", "page": "3-04-12"},
+        {"name": "The Times Table", "page": "3-04-14"},
+        {"name": "The Commutative Property", "page": "3-04-16"},
+        {"name": "Block Blob", "page": "3-04-26"},
+        {"name": "Multiplying Big Numbers", "page": "3-04-28"},
+        {"name": "The Associative Property", "page": "3-04-29"},
+        {"name": "Multiplying by 4 and by 5", "page": "3-04-33"},
+        {"name": "Winnie's Notes", "page": "3-04-37"},
+        {"name": "Penny Rows", "page": "3-04-42"},
+        {"name": "Grogg's Notes", "page": "3-04-43"}
+      ]},
+      {"number": 5, "name": "Perfect Squares", "toc": "3-05-01", "sections": [
+        {"name": "Perfect Squares", "page": "3-05-48"},
+        {"name": "Squares that End in 5", "page": "3-05-50"},
+        {"name": "Squaring Up", "page": "3-05-54"},
+        {"name": "Winnie's Notes", "page": "3-05-58"},
+        {"name": "Dots and Boxes", "page": "3-05-62"},
+        {"name": "In the Garden", "page": "3-05-63"},
+        {"name": "Dissections", "page": "3-05-64"},
+        {"name": "Alex's Notes", "page": "3-05-71"}
+      ]},
+      {"number": 6, "name": "The Distributive Property", "toc": "3-06-01", "sections": [
+        {"name": "Order of Operations", "page": "3-06-74"},
+        {"name": "Big Rectangles", "page": "3-06-78"},
+        {"name": "Pirate Booty", "page": "3-06-82"},
+        {"name": "The Distributive Property", "page": "3-06-87"},
+        {"name": "Math Meet", "page": "3-06-91"}
+      ]},
+      {"number": 7, "name": "Variables", "toc": "3-07-01", "sections": [
+        {"name": "The Number 7", "page": "3-07-12"},
+        {"name": "Variables", "page": "3-07-14"},
+        {"name": "Winnie's Notes", "page": "3-07-17"},
+        {"name": "Writing Equations", "page": "3-07-23"},
+        {"name": "Lizzie's Notes", "page": "3-07-24"},
+        {"name": "Solving Equations", "page": "3-07-29"},
+        {"name": "Wild Tic-tac-toe", "page": "3-07-35"},
+        {"name": "Capsules", "page": "3-07-36"}
+      ]},
+      {"number": 8, "name": "Division", "toc": "3-08-01", "sections": [
+        {"name": "Sharing", "page": "3-08-42"},
+        {"name": "× and ÷", "page": "3-08-44"},
+        {"name": "Leftovers", "page": "3-08-50"},
+        {"name": "Lizzie's Notes", "page": "3-08-53"},
+        {"name": "Remainders", "page": "3-08-60"},
+        {"name": "Teamwork", "page": "3-08-61"},
+        {"name": "Nim", "page": "3-08-69"}
+      ]},
+      {"number": 9, "name": "Measurement", "toc": "3-09-01", "sections": [
+        {"name": "Flossie", "page": "3-09-72"},
+        {"name": "Units", "page": "3-09-74"},
+        {"name": "Customary Units", "page": "3-09-77"},
+        {"name": "Lizzie's Notes", "page": "3-09-83"},
+        {"name": "Carpool", "page": "3-09-84"},
+        {"name": "The Metric System", "page": "3-09-86"},
+        {"name": "Math Meet", "page": "3-09-90"},
+        {"name": "Alex's Notes", "page": "3-09-100"},
+        {"name": "Proper Measurin'", "page": "3-09-101"}
+      ]},
+      {"number": 10, "name": "Fractions", "toc": "3-10-01", "sections": [
+        {"name": "One-Eighth", "page": "3-10-12"},
+        {"name": "Unit Fractions", "page": "3-10-14"},
+        {"name": "Whole-Number Fractions", "page": "3-10-17"},
+        {"name": "Equal Fractions", "page": "3-10-22"},
+        {"name": "Mixed Numbers", "page": "3-10-25"},
+        {"name": "Parts of a Whole", "page": "3-10-29"},
+        {"name": "Equivalent Fractions", "page": "3-10-34"},
+        {"name": "Comparing Fractions", "page": "3-10-39"},
+        {"name": "Alex's Notes", "page": "3-10-45"}
+      ]},
+      {"number": 11, "name": "Estimation", "toc": "3-11-01", "sections": [
+        {"name": "Close Enough", "page": "3-11-52"},
+        {"name": "Rounding", "page": "3-11-54"},
+        {"name": "Over and Underestimating", "page": "3-11-57"},
+        {"name": "Quotients", "page": "3-11-63"},
+        {"name": "Handprint Area", "page": "3-11-67"},
+        {"name": "Guesstimate", "page": "3-11-72"}
+      ]},
+      {"number": 12, "name": "Area", "toc": "3-12-01", "sections": [
+        {"name": "Measuring Area", "page": "3-12-74"},
+        {"name": "Square Units", "page": "3-12-76"},
+        {"name": "Lizzie's Scrapbook", "page": "3-12-81"},
+        {"name": "Right Triangles", "page": "3-12-86"},
+        {"name": "Triangle Area", "page": "3-12-88"},
+        {"name": "Math Meet", "page": "3-12-93"}
+      ]}
+    ]
+  },
+  {
+    "book": 4, "name": "Beast Academy 4",
+    "chapters": [
+      {"number": 1, "name": "Shapes", "toc": "4-01-01", "sections": [
+        {"name": "Definitions", "page": "4-01-12"},
+        {"name": "Measuring Angles", "page": "4-01-14"},
+        {"name": "Parallel and Perpendicular", "page": "4-01-19"},
+        {"name": "Symmetry", "page": "4-01-25"},
+        {"name": "Carronade", "page": "4-01-31"},
+        {"name": "Grogg's Notes", "page": "4-01-38"}
+      ]},
+      {"number": 2, "name": "Multiplication", "toc": "4-02-01", "sections": [
+        {"name": "One Part at a Time", "page": "4-02-40"},
+        {"name": "The Algorithm", "page": "4-02-42"},
+        {"name": "The Units Digit", "page": "4-02-49"},
+        {"name": "1's and 0's", "page": "4-02-54"}
+      ]},
+      {"number": 3, "name": "Exponents", "toc": "4-03-01", "sections": [
+        {"name": "Exponents", "page": "4-03-68"},
+        {"name": "Lizzie's Notes", "page": "4-03-70"},
+        {"name": "Order of Operations", "page": "4-03-75"},
+        {"name": "Power Play", "page": "4-03-76"},
+        {"name": "Perfect Squares", "page": "4-03-74"},
+        {"name": "Math Meet", "page": "4-03-80"},
+        {"name": "Binary Island", "page": "4-03-85"},
+        {"name": "Base-2", "page": "4-03-93"},
+        {"name": "Grogg's Notes", "page": "4-03-98"}
+      ]},
+      {"number": 4, "name": "Counting", "toc": "4-04-01", "sections": [
+        {"name": "Counting", "page": "4-04-12"},
+        {"name": "Choices", "page": "4-04-14"},
+        {"name": "Venn Diagrams", "page": "4-04-19"},
+        {"name": "Factorials", "page": "4-04-23"},
+        {"name": "Alex's Notes", "page": "4-04-28"},
+        {"name": "Counting Pairs", "page": "4-04-35"},
+        {"name": "Lizzie's Notes", "page": "4-04-36"}
+      ]},
+      {"number": 5, "name": "Division", "toc": "4-05-01", "sections": [
+        {"name": "Special Quotients", "page": "4-05-46"},
+        {"name": "Multiples of Ten", "page": "4-05-48"},
+        {"name": "Long Division", "page": "4-05-53"},
+        {"name": "Carpool", "page": "4-05-60"},
+        {"name": "Divisibility", "page": "4-05-65"}
+      ]},
+      {"number": 6, "name": "Logic", "toc": "4-06-01", "sections": [
+        {"name": "Logic Puzzles", "page": "4-06-76"},
+        {"name": "Bon Voyage", "page": "4-06-78"},
+        {"name": "Grid Puzzles", "page": "4-06-82"},
+        {"name": "Code Breaker", "page": "4-06-83"},
+        {"name": "Truth-tellers and Liars", "page": "4-06-89"},
+        {"name": "The Math Bowl", "page": "4-06-90"}
+      ]},
+      {"number": 7, "name": "Factors", "toc": "4-07-01", "sections": [
+        {"name": "Factors", "page": "4-07-12"},
+        {"name": "The Sieve", "page": "4-07-14"},
+        {"name": "Fizz Buzz", "page": "4-07-22"},
+        {"name": "Divisibility", "page": "4-07-31"},
+        {"name": "Prime Factorization", "page": "4-07-32"}
+      ]},
+      {"number": 8, "name": "Fractions (+ & -)", "toc": "4-08-01", "sections": [
+        {"name": "Review", "page": "4-08-48"},
+        {"name": "Adding Fractions", "page": "4-08-50"},
+        {"name": "Mixed Numbers", "page": "4-08-56"},
+        {"name": "Rummy", "page": "4-08-58"},
+        {"name": "Adding Mixed Numbers", "page": "4-08-63"},
+        {"name": "Story Problem", "page": "4-08-64"},
+        {"name": "Fraction Subtraction", "page": "4-08-67"},
+        {"name": "Mental Math", "page": "4-08-68"}
+      ]},
+      {"number": 9, "name": "Integers", "toc": "4-09-01", "sections": [
+        {"name": "Negatives", "page": "4-09-78"},
+        {"name": "Less Than Zero", "page": "4-09-80"},
+        {"name": "Adding Integers", "page": "4-09-82"},
+        {"name": "Grogg's Notes", "page": "4-09-87"},
+        {"name": "Subtracting Integers", "page": "4-09-93"},
+        {"name": "Rearranging", "page": "4-09-94"},
+        {"name": "Lizzie's Notes", "page": "4-09-100"}
+      ]},
+      {"number": 10, "name": "Fractions (× & ÷)", "toc": "4-10-01", "sections": [
+        {"name": "Of", "page": "4-10-12"},
+        {"name": "Multiplying Fractions", "page": "4-10-14"},
+        {"name": "Multiplying by a Fraction", "page": "4-10-17"},
+        {"name": "Mixed Numbers", "page": "4-10-22"},
+        {"name": "Story Problem", "page": "4-10-26"},
+        {"name": "Division", "page": "4-10-31"}
+      ]},
+      {"number": 11, "name": "Decimals", "toc": "4-11-01", "sections": [
+        {"name": "Decimals", "page": "4-11-38"},
+        {"name": "Reading Decimals", "page": "4-11-40"},
+        {"name": "Comparing Decimals", "page": "4-11-45"},
+        {"name": "Lunch", "page": "4-11-50"},
+        {"name": "Alex's Notes", "page": "4-11-58"},
+        {"name": "Adding and Subtracting", "page": "4-11-61"},
+        {"name": "Paid Advertisement", "page": "4-11-62"}
+      ]},
+      {"number": 12, "name": "Probability", "toc": "4-12-01", "sections": [
+        {"name": "Chance", "page": "4-12-70"},
+        {"name": "Computing Probability", "page": "4-12-72"},
+        {"name": "Grogg's Notes", "page": "4-12-76"},
+        {"name": "Coins and Dice", "page": "4-12-83"},
+        {"name": "Flip!", "page": "4-12-84"},
+        {"name": "Math Relays: Round 1", "page": "4-12-90"},
+        {"name": "Channel 5", "page": "4-12-94"},
+        {"name": "Math Relays: The Finals", "page": "4-12-100"}
+      ]}
+    ]
+  },
+  {
+    "book": 5, "name": "Beast Academy 5",
+    "chapters": [
+      {"number": 1, "name": "3D Solids", "toc": "5-01-01", "sections": [
+        {"name": "3D", "page": "5-01-12"},
+        {"name": "Solids", "page": "5-01-14"},
+        {"name": "Grogg's Notes", "page": "5-01-18"},
+        {"name": "Nets", "page": "5-01-24"},
+        {"name": "Surface Area", "page": "5-01-26"},
+        {"name": "Alex's Notes", "page": "5-01-32"},
+        {"name": "Volume", "page": "5-01-39"}
+      ]},
+      {"number": 2, "name": "Integers", "toc": "5-02-01", "sections": [
+        {"name": "Review", "page": "5-02-46"},
+        {"name": "Lunch", "page": "5-02-48"},
+        {"name": "Multiplying Integers", "page": "5-02-51"},
+        {"name": "Winnie's Homework", "page": "5-02-52"},
+        {"name": "Carpool", "page": "5-02-59"},
+        {"name": "Dividing Integers", "page": "5-02-60"},
+        {"name": "Exponents", "page": "5-02-64"},
+        {"name": "Lizzie's Notes", "page": "5-02-68"}
+      ]},
+      {"number": 3, "name": "Expressions & Equations", "toc": "5-03-01", "sections": [
+        {"name": "Notation", "page": "5-03-76"},
+        {"name": "Simplifying", "page": "5-03-78"},
+        {"name": "Isolating x", "page": "5-03-84"},
+        {"name": "Solving Equations", "page": "5-03-90"},
+        {"name": "Carpool", "page": "5-03-95"},
+        {"name": "Math Meet", "page": "5-03-99"}
+      ]},
+      {"number": 4, "name": "Statistics", "toc": "5-04-01", "sections": [
+        {"name": "The Middle", "page": "5-04-12"},
+        {"name": "Average", "page": "5-04-14"},
+        {"name": "Averaging", "page": "5-04-20"},
+        {"name": "Range & Mode", "page": "5-04-26"},
+        {"name": "Stat Stumped", "page": "5-04-34"}
+      ]},
+      {"number": 5, "name": "Factors & Multiples", "toc": "5-05-01", "sections": [
+        {"name": "Factors", "page": "5-05-42"},
+        {"name": "GCF", "page": "5-05-44"},
+        {"name": "GCF3All", "page": "5-05-50"},
+        {"name": "LCM", "page": "5-05-57"},
+        {"name": "Grogg's Notes", "page": "5-05-58"},
+        {"name": "Factorials", "page": "5-05-66"}
+      ]},
+      {"number": 6, "name": "Fractions", "toc": "5-06-01", "sections": [
+        {"name": "Addition & Subtraction", "page": "5-06-76"},
+        {"name": "Multiplication", "page": "5-06-78"},
+        {"name": "More Multiplication", "page": "5-06-84"},
+        {"name": "Cancelling", "page": "5-06-88"},
+        {"name": "Training", "page": "5-06-95"},
+        {"name": "Channel 5", "page": "5-06-96"},
+        {"name": "The Final Round", "page": "5-06-102"}
+      ]},
+      {"number": 7, "name": "Sequences", "toc": "5-07-01", "sections": [
+        {"name": "Next", "page": "5-07-12"},
+        {"name": "Sequences", "page": "5-07-14"},
+        {"name": "Subtractionacci", "page": "5-07-20"},
+        {"name": "Arithmetic Sequences", "page": "5-07-27"},
+        {"name": "Triangular Numbers", "page": "5-07-35"}
+      ]},
+      {"number": 8, "name": "Ratios & Rates", "toc": "5-08-01", "sections": [
+        {"name": "Ratios", "page": "5-08-42"},
+        {"name": "Proportions", "page": "5-08-44"},
+        {"name": "Rates", "page": "5-08-52"},
+        {"name": "Unit Conversions", "page": "5-08-58"}
+      ]},
+      {"number": 9, "name": "Decimals", "toc": "5-09-01", "sections": [
+        {"name": "Tens & Tenths", "page": "5-09-70"},
+        {"name": "Multiplying Decimals", "page": "5-09-72"},
+        {"name": "Conversions", "page": "5-09-78"},
+        {"name": "Math Meet", "page": "5-09-83"}
+      ]},
+      {"number": 10, "name": "Percents", "toc": "5-10-01", "sections": [
+        {"name": "Percents & Fractions", "page": "5-10-12"},
+        {"name": "Percents & Decimals", "page": "5-10-14"},
+        {"name": "Percent of a Number", "page": "5-10-19"},
+        {"name": "Finding Percents", "page": "5-10-24"},
+        {"name": "Proportions", "page": "5-10-28"}
+      ]},
+      {"number": 11, "name": "Square Roots", "toc": "5-11-01", "sections": [
+        {"name": "Square Roots", "page": "5-11-40"},
+        {"name": "Lizzie's Notes", "page": "5-11-42"},
+        {"name": "Estimation", "page": "5-11-47"},
+        {"name": "More or Less", "page": "5-11-48"},
+        {"name": "Tricky Square Roots", "page": "5-11-55"},
+        {"name": "The Pythagorean Theorem", "page": "5-11-56"}
+      ]},
+      {"number": 12, "name": "Exponents", "toc": "5-12-01", "sections": [
+        {"name": "Exponents", "page": "5-12-72"},
+        {"name": "Negative Exponents", "page": "5-12-74"},
+        {"name": "Pneumatube", "page": "5-12-80"},
+        {"name": "The WMOC", "page": "5-12-84"},
+        {"name": "Channel 5", "page": "5-12-90"},
+        {"name": "The Finals", "page": "5-12-92"}
+      ]}
+    ]
+  }
+]

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Maths Comic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            height: 100vh;
+            height: 100dvh;
+        }
+        
+        /* TOC Toggle */
+        .toc-toggle {
+            position: fixed;
+            top: 50px;
+            left: 0;
+            z-index: 2000;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 0 6px 6px 0;
+            padding: 10px 8px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        }
+        .toc-toggle:hover { background: #764ba2; padding-left: 12px; }
+        
+        /* TOC Sidebar */
+        .toc-sidebar {
+            width: 320px;
+            background: #222;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s, width 0.3s;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+        body.toc-collapsed .toc-sidebar { transform: translateX(-320px); width: 0; }
+        
+        .toc-header {
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .toc-header h1 { font-size: 18px; color: #fff; margin-bottom: 4px; }
+        .toc-header p { font-size: 12px; color: rgba(255,255,255,0.7); }
+        
+        .toc-content { flex: 1; overflow-y: auto; padding: 10px; }
+        .toc-content::-webkit-scrollbar { width: 6px; }
+        .toc-content::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+        
+        .strand { margin-bottom: 8px; }
+        .strand-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .strand-header:hover { background: #333; }
+        .strand-arrow { font-size: 10px; color: #888; transition: transform 0.2s; width: 12px; }
+        .strand.expanded .strand-arrow { transform: rotate(90deg); }
+        .strand-name { flex: 1; font-weight: 600; font-size: 14px; }
+        .strand-count { background: #444; color: #aaa; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+        
+        .strand-topics { max-height: 0; overflow: hidden; transition: max-height 0.3s; }
+        .strand.expanded .strand-topics { max-height: 2000px; }
+        
+        .topic {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px 10px 30px;
+            margin-top: 2px;
+            background: #252525;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .topic:hover { background: #333; }
+        .topic.active { background: #667eea; }
+        .topic-num { color: #667eea; font-weight: 600; font-size: 12px; min-width: 28px; }
+        .topic.active .topic-num { color: #fff; }
+        .topic-title { flex: 1; font-size: 13px; }
+        .topic-pages { color: #555; font-size: 11px; }
+        .topic.active .topic-pages { color: rgba(255,255,255,0.7); }
+        
+        /* Viewer */
+        .viewer { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .top-bar {
+            background: #222;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            min-height: 44px;
+            flex-shrink: 0;
+            gap: 10px;
+        }
+        .topic-name { font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .topic-name strong { color: #667eea; }
+        .top-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .page-info { font-size: 13px; color: #888; }
+        .page-info span { color: #fff; }
+        
+        .fit-toggle {
+            display: flex;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .fit-btn {
+            background: transparent;
+            border: none;
+            color: #888;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .fit-btn:hover { color: #ccc; }
+        .fit-btn.active { background: #667eea; color: #fff; }
+        
+        .zoom-controls { display: flex; align-items: center; gap: 2px; }
+        .zoom-btn {
+            background: #333;
+            border: 1px solid #444;
+            color: #ccc;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .zoom-btn:hover { background: #444; }
+        .zoom-level { font-size: 11px; color: #888; min-width: 36px; text-align: center; }
+        
+        .copy-btn {
+            background: #333;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .copy-btn:hover { background: #444; }
+        .copy-btn.copied { background: #27ae60; border-color: #27ae60; color: #fff; }
+        
+        /* Image Container */
+        .image-container {
+            flex: 1;
+            overflow: auto;
+            background: #111;
+            display: flex;
+            justify-content: center;
+        }
+        
+        body.fit-width .image-container { align-items: flex-start; }
+        body.fit-width .image-container img {
+            width: 100%;
+            max-width: 950px;
+            height: auto;
+        }
+        
+        body.fit-height .image-container { align-items: center; overflow: hidden; }
+        body.fit-height .image-container img {
+            width: auto;
+            height: 100%;
+        }
+        
+        .image-container img { display: block; transform-origin: center center; }
+        
+        /* Side Nav */
+        .side-nav {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: none;
+            width: 50px;
+            height: 120px;
+            font-size: 26px;
+            cursor: pointer;
+            opacity: 0.4;
+        }
+        .side-nav:hover { opacity: 1; background: #667eea; }
+        .side-nav:disabled { opacity: 0.15; cursor: default; background: rgba(0,0,0,0.6); }
+        .side-nav.prev { left: 0; border-radius: 0 10px 10px 0; }
+        .side-nav.next { right: 0; border-radius: 10px 0 0 10px; }
+        
+        /* Landing */
+        .landing {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+        }
+        .landing h1 { font-size: 2rem; margin-bottom: 10px; }
+        .landing p { color: #888; margin-bottom: 20px; }
+        .landing-hint { color: #667eea; }
+        
+        .viewer-content { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+        .viewer-content.active { display: flex; }
+        
+        @media (max-width: 700px) {
+            .toc-sidebar { width: 280px; }
+            body.toc-collapsed .toc-sidebar { transform: translateX(-280px); }
+            .side-nav { width: 40px; height: 80px; font-size: 20px; }
+            .zoom-controls { display: none; }
+        }
+        @media (max-width: 480px) {
+            .fit-toggle { display: none; }
+        }
+    </style>
+</head>
+<body class="toc-collapsed fit-height">
+
+<button class="toc-toggle" onclick="toggleTOC()">☰</button>
+
+<div class="toc-sidebar">
+    <div class="toc-header">
+        <h1>📚 Maths Comic</h1>
+        <p>5 Strands · {{TOTAL_TOPICS}} Topics</p>
+    </div>
+    <div class="toc-content">
+{{TOC_HTML}}
+    </div>
+</div>
+
+<div class="viewer">
+    <div class="landing" id="landing">
+        <h1>📚 Maths Comic</h1>
+        <p>{{TOTAL_TOPICS}} Topics · JC Aligned</p>
+        <div class="landing-hint">☰ Open menu to select a topic</div>
+    </div>
+    
+    <div class="viewer-content" id="viewerContent">
+        <div class="top-bar">
+            <div class="topic-name" id="topicName"></div>
+            <div class="top-right">
+                <div class="fit-toggle">
+                    <button class="fit-btn" data-fit="height" onclick="setFitMode('height')">H</button>
+                    <button class="fit-btn" data-fit="width" onclick="setFitMode('width')">W</button>
+                </div>
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomOut()">−</button>
+                    <span class="zoom-level" id="zoomLevel">100%</span>
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <button class="zoom-btn" onclick="resetZoom()">⟲</button>
+                </div>
+                <div class="page-info"><span id="pageNum">1</span>/<span id="totalPages">1</span></div>
+                <button class="copy-btn" onclick="copyLink()">🔗</button>
+            </div>
+        </div>
+        <div class="image-container" id="imageContainer">
+            <img id="pageImage" src="" alt="">
+        </div>
+    </div>
+</div>
+
+<button class="side-nav prev" id="prevBtn" onclick="prevPage()" style="display:none;">◀</button>
+<button class="side-nav next" id="nextBtn" onclick="nextPage()" style="display:none;">▶</button>
+
+<script>
+const topics = {{JS_TOPICS}};
+
+let currentTopic = 0, currentPage = 1, totalPages = 1, zoomLevel = 1;
+let fitMode = localStorage.getItem('fitMode') || 'height';
+
+document.body.classList.remove('fit-width', 'fit-height');
+document.body.classList.add('fit-' + fitMode);
+updateFitButtons();
+
+function toggleTOC() { document.body.classList.toggle('toc-collapsed'); }
+function toggleStrand(el) { el.parentElement.classList.toggle('expanded'); }
+
+function setFitMode(mode) {
+    fitMode = mode;
+    localStorage.setItem('fitMode', mode);
+    document.body.classList.remove('fit-width', 'fit-height');
+    document.body.classList.add('fit-' + mode);
+    updateFitButtons();
+    resetZoom();
+}
+
+function updateFitButtons() {
+    document.querySelectorAll('.fit-btn').forEach(b => b.classList.toggle('active', b.dataset.fit === fitMode));
+}
+
+function openTopic(t) {
+    if (!topics[t]) return;
+    currentTopic = t;
+    totalPages = topics[t].pages;
+    currentPage = 1;
+    resetZoom();
+    
+    const params = new URLSearchParams(location.search);
+    if (parseInt(params.get('t')) === t && params.get('p')) {
+        currentPage = Math.max(1, Math.min(totalPages, parseInt(params.get('p'))));
+    }
+    
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('viewerContent').classList.add('active');
+    document.getElementById('prevBtn').style.display = 'flex';
+    document.getElementById('nextBtn').style.display = 'flex';
+    document.getElementById('topicName').innerHTML = '<strong>' + t + '.</strong> ' + topics[t].title;
+    document.getElementById('totalPages').textContent = totalPages;
+    
+    document.querySelectorAll('.topic').forEach(el => el.classList.toggle('active', parseInt(el.dataset.t) === t));
+    
+    if (window.innerWidth <= 700) document.body.classList.add('toc-collapsed');
+    updatePage();
+}
+
+function updatePage() {
+    const img = 'webp/' + String(currentTopic).padStart(2,'0') + String(currentPage).padStart(2,'0') + '.webp';
+    document.getElementById('pageImage').src = img;
+    document.getElementById('pageNum').textContent = currentPage;
+    document.getElementById('prevBtn').disabled = currentPage <= 1;
+    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+    history.replaceState(null, '', '?t=' + currentTopic + '&p=' + currentPage);
+    document.getElementById('imageContainer').scrollTo(0, 0);
+}
+
+function prevPage() { if (currentPage > 1) { currentPage--; resetZoom(); updatePage(); } }
+function nextPage() { if (currentPage < totalPages) { currentPage++; resetZoom(); updatePage(); } }
+
+function setZoom(level) {
+    zoomLevel = Math.max(0.5, Math.min(4, level));
+    document.getElementById('pageImage').style.transform = 'scale(' + zoomLevel + ')';
+    document.getElementById('zoomLevel').textContent = Math.round(zoomLevel * 100) + '%';
+}
+function zoomIn() { setZoom(zoomLevel + 0.25); }
+function zoomOut() { setZoom(zoomLevel - 0.25); }
+function resetZoom() { setZoom(1); }
+
+function copyLink() {
+    navigator.clipboard.writeText(location.href).then(() => {
+        const b = document.querySelector('.copy-btn');
+        b.classList.add('copied'); b.textContent = '✓';
+        setTimeout(() => { b.classList.remove('copied'); b.textContent = '🔗'; }, 1500);
+    });
+}
+
+document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowLeft') prevPage();
+    if (e.key === 'ArrowRight') nextPage();
+    if (e.key === 't' || e.key === 'T') toggleTOC();
+    if (e.key === 'f' || e.key === 'F') setFitMode(fitMode === 'width' ? 'height' : 'width');
+    if ((e.key === '+' || e.key === '=') && !e.ctrlKey) { e.preventDefault(); zoomIn(); }
+    if (e.key === '-' && !e.ctrlKey) { e.preventDefault(); zoomOut(); }
+    if (e.key === '0' && !e.ctrlKey) { e.preventDefault(); resetZoom(); }
+});
+
+document.getElementById('imageContainer').addEventListener('wheel', e => {
+    if (e.ctrlKey) { e.preventDefault(); e.deltaY < 0 ? zoomIn() : zoomOut(); }
+}, { passive: false });
+
+document.addEventListener('wheel', e => {
+    if (e.ctrlKey && !document.getElementById('imageContainer').contains(e.target)) e.preventDefault();
+}, { passive: false });
+
+let touchStartX = 0, isSwiping = false;
+document.getElementById('imageContainer').addEventListener('touchstart', e => {
+    if (e.touches.length === 1) { touchStartX = e.touches[0].clientX; isSwiping = true; }
+}, { passive: true });
+document.getElementById('imageContainer').addEventListener('touchmove', e => {
+    if (e.touches.length > 1) isSwiping = false;
+}, { passive: true });
+document.getElementById('imageContainer').addEventListener('touchend', e => {
+    if (!isSwiping) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) dx > 0 ? prevPage() : nextPage();
+    isSwiping = false;
+}, { passive: true });
+
+window.onload = () => {
+    const params = new URLSearchParams(location.search);
+    const t = parseInt(params.get('t'));
+    if (t && topics[t]) {
+        openTopic(t);
+        document.querySelectorAll('.topic').forEach(el => {
+            if (parseInt(el.dataset.t) === t) el.closest('.strand').classList.add('expanded');
+        });
+    } else {
+        document.body.classList.remove('toc-collapsed');
+        const first = document.querySelector('.strand');
+        if (first) first.classList.add('expanded');
+    }
+};
+</script>
+</body>
+</html>
