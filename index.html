@@ -58,14 +58,10 @@ button.copied{background:#1a7a1a;border-color:#2a9a2a;color:#fff;transition:back
 #currentPage:hover{background:#444}
 .page-input{width:50px;padding:3px;text-align:center;background:#1a1a1a;border:1px solid #0066cc;border-radius:4px;color:#e0e0e0;font-size:12px}
 
-/* ── Image container ── */
-.image-container{flex:1;display:flex;justify-content:center;align-items:flex-start;overflow:auto;background:#111;position:relative;min-height:0;-webkit-overflow-scrolling:touch}
-.image-container.fit-height{align-items:center;overflow:hidden}
-.image-container.fit-height img{max-height:100%;width:auto;height:auto}
-.image-container.fit-width{overflow-y:auto;overflow-x:hidden}
-.image-container.fit-width img{width:100%;max-width:100%;height:auto}
-#pageImage{display:block;box-shadow:0 4px 20px rgba(0,0,0,.5);transform-origin:center center}
-
+/* ── Gesture-enabled page canvas ── */
+.image-container{flex:1;position:relative;overflow:hidden;background:#111;min-height:0;touch-action:none;overscroll-behavior:contain;cursor:grab;user-select:none;-webkit-user-select:none}
+.image-container.dragging{cursor:grabbing}
+#pageImage{position:absolute;top:0;left:0;display:block;max-width:none;max-height:none;transform-origin:0 0;box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;-webkit-user-drag:none;will-change:transform}
 .zoom-indicator{position:fixed;bottom:20px;right:80px;background:rgba(0,0,0,.7);color:#fff;padding:6px 12px;border-radius:4px;font-size:13px;display:none;z-index:1200}
 
 /* ── Instagram side nav ── */
@@ -187,6 +183,10 @@ const CONFIG = {"pages":["pages/1-01-01.webp","pages/1-01-02.webp","pages/1-01-0
 const $ = id => document.getElementById(id);
 const img = $('pageImage');
 const container = $('imageContainer');
+img.draggable = false;
+let baseWidth = 0, baseHeight = 0;
+img.addEventListener('load', () => layoutImage(true));
+window.addEventListener('resize', () => layoutImage(false));
 
 // ── State ──
 let state = { page: 0, zoom: 1, fitMode: 'height', translateX: 0, translateY: 0 };
@@ -215,10 +215,10 @@ function chRef(p) { return p.book + '-' + String(p.chapter).padStart(2,'0'); }
 function loadPage(idx) {
     if (idx < 0 || idx >= CONFIG.pages.length) return;
     state.page = idx;
+    state.zoom = 1;
+    state.translateX = state.translateY = 0;
     img.src = CONFIG.pages[idx];
-    state.zoom = 1; state.translateX = state.translateY = 0;
-    updateTransform();
-    container.scrollTop = container.scrollLeft = 0;
+    if (img.complete && img.naturalWidth) layoutImage(true);
     updateBreadcrumb();
     updateTOCHighlight();
     updateScrollButtons();
@@ -258,42 +258,95 @@ function updateBreadcrumb() {
     });
 }
 
-// ── Scroll up/down (for fit-width on PC without touch) ──
+// ── Scroll arrows: move the page, including at its normal fit-width size ──
 function scrollPage(dir) {
-    container.scrollBy({ top: dir * container.clientHeight * 0.6, behavior: 'smooth' });
+    pan(0, -dir * container.clientHeight * .6);
 }
-
 function updateScrollButtons() {
-    $('scrollUp').classList.add('visible');
-    $('scrollDown').classList.add('visible');
+    const room = baseHeight * state.zoom > container.clientHeight + 2;
+    $('scrollUp').classList.toggle('visible', room);
+    $('scrollDown').classList.toggle('visible', room);
 }
 
-// ── Fit mode ──
-function setFitMode(mode) {
-    state.fitMode = mode;
-    container.classList.remove('fit-height', 'fit-width');
-    container.classList.add('fit-' + mode);
-    $('fitHeight').classList.toggle('active', mode === 'height');
-    $('fitWidth').classList.toggle('active', mode === 'width');
-    state.zoom = 1; state.translateX = state.translateY = 0;
+// ── Fit-to-height / fit-to-width, maintaining a genuine movable image ──
+function layoutImage(reset = false) {
+    if (!img.naturalWidth || !img.naturalHeight) return;
+    const w = container.clientWidth, h = container.clientHeight;
+    if (!w || !h) return;
+
+    const oldW = baseWidth, oldH = baseHeight;
+    const oldViewX = (w / 2 - state.translateX) / (oldW * state.zoom);
+    const oldViewY = (h / 2 - state.translateY) / (oldH * state.zoom);
+    const factor = state.fitMode === 'width'
+        ? w / img.naturalWidth
+        : Math.min(w / img.naturalWidth, h / img.naturalHeight);
+    baseWidth = img.naturalWidth * factor;
+    baseHeight = img.naturalHeight * factor;
+    img.style.width = baseWidth + 'px';
+    img.style.height = baseHeight + 'px';
+
+    if (reset || !oldW || !oldH) {
+        state.zoom = 1;
+        state.translateX = (w - baseWidth) / 2;
+        state.translateY = baseHeight > h ? 0 : (h - baseHeight) / 2;
+    } else {
+        state.translateX = w / 2 - oldViewX * baseWidth * state.zoom;
+        state.translateY = h / 2 - oldViewY * baseHeight * state.zoom;
+    }
     updateTransform();
-    updateScrollButtons();
+}
+
+function setFitMode(mode) {
+    state.fitMode = mode === 'width' ? 'width' : 'height';
+    container.classList.toggle('fit-height', state.fitMode === 'height');
+    container.classList.toggle('fit-width', state.fitMode === 'width');
+    $('fitHeight').classList.toggle('active', state.fitMode === 'height');
+    $('fitWidth').classList.toggle('active', state.fitMode === 'width');
+    layoutImage(true);
     saveState();
 }
 
-// ── Zoom / pan ──
-function updateTransform() {
-    if (state.zoom === 1) {
-        img.style.transform = '';
-        $('zoomIndicator').style.display = 'none';
-    } else {
-        img.style.transform = `scale(${state.zoom}) translate(${state.translateX}px,${state.translateY}px)`;
-        $('zoomIndicator').textContent = Math.round(state.zoom * 100) + '%';
-        $('zoomIndicator').style.display = 'block';
-    }
+// ── Screen-coordinate pan and cursor-anchored zoom ──
+function clampPan() {
+    if (!baseWidth || !baseHeight) return;
+    const w = container.clientWidth, h = container.clientHeight;
+    const sw = baseWidth * state.zoom, sh = baseHeight * state.zoom;
+    state.translateX = sw <= w ? (w - sw) / 2
+        : Math.max(w - sw, Math.min(0, state.translateX));
+    state.translateY = sh <= h ? (h - sh) / 2
+        : Math.max(h - sh, Math.min(0, state.translateY));
 }
-function zoom(delta) { state.zoom = Math.max(.25, Math.min(5, state.zoom + delta)); updateTransform(); }
-function pan(dx, dy) { if (state.zoom > 1) { state.translateX += dx; state.translateY += dy; updateTransform(); return true; } return false; }
+function updateTransform() {
+    if (!baseWidth) return;
+    clampPan();
+    img.style.transform = `translate3d(${state.translateX}px,${state.translateY}px,0) scale(${state.zoom})`;
+    const active = Math.abs(state.zoom - 1) > .001;
+    $('zoomIndicator').style.display = active ? 'block' : 'none';
+    $('zoomIndicator').textContent = Math.round(state.zoom * 100) + '%';
+    updateScrollButtons();
+}
+function zoomAt(newZoom, x, y) {
+    if (!baseWidth) return;
+    newZoom = Math.max(.5, Math.min(6, newZoom));
+    const imageX = (x - state.translateX) / state.zoom;
+    const imageY = (y - state.translateY) / state.zoom;
+    state.zoom = newZoom;
+    state.translateX = x - imageX * newZoom;
+    state.translateY = y - imageY * newZoom;
+    updateTransform();
+}
+function zoom(delta) {
+    zoomAt(state.zoom + delta, container.clientWidth / 2, container.clientHeight / 2);
+    saveState();
+}
+function pan(dx, dy) {
+    if (!baseWidth) return false;
+    const x = state.translateX, y = state.translateY;
+    state.translateX += dx;
+    state.translateY += dy;
+    updateTransform();
+    return Math.abs(state.translateX - x) + Math.abs(state.translateY - y) > .1;
+}
 
 // ── Page input ──
 function showPageInput() {
@@ -454,7 +507,7 @@ $('copyLink').onclick = () => {
     });
 };
 $('currentPage').onclick = showPageInput;
-img.ondblclick = () => { state.zoom = 1; state.translateX = state.translateY = 0; updateTransform(); };
+container.addEventListener('dblclick', () => { layoutImage(true); saveState(); });
 
 // Tap on image to toggle UI in immersive mode
 container.addEventListener('click', e => {
@@ -499,28 +552,102 @@ document.addEventListener('keydown', e => {
     else if (k === 'Escape') { if (isCleanMode()) { document.body.classList.remove('clean-mode','show-ui'); } }
 });
 
-// Ctrl+wheel zoom
-document.addEventListener('wheel', e => {
-    if (e.ctrlKey || e.metaKey) { e.preventDefault(); zoom(e.deltaY > 0 ? -.1 : .1); }
+// ── Mouse wheel, trackpad scroll and trackpad pinch (Ctrl+wheel) ──
+container.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey) {
+        const r = container.getBoundingClientRect();
+        // Trackpad pinch emits small Ctrl+wheel deltas on Chromium.
+        zoomAt(state.zoom * Math.exp(-e.deltaY * .008), e.clientX - r.left, e.clientY - r.top);
+    } else {
+        const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? container.clientHeight : 1;
+        pan(-e.deltaX * unit, -e.deltaY * unit);
+    }
+    saveState();
 }, { passive: false });
 
-// Touch swipe
-let touchStart = null;
-container.addEventListener('touchstart', e => {
-    if (e.touches.length === 1 && state.zoom === 1) touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() };
-}, { passive: true });
-container.addEventListener('touchend', e => {
-    if (!touchStart || state.zoom !== 1) { touchStart = null; return; }
-    const dx = e.changedTouches[0].clientX - touchStart.x;
-    const dy = e.changedTouches[0].clientY - touchStart.y;
-    const dt = Date.now() - touchStart.t;
-    // Horizontal swipe: change page
-    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5 && dt < 500) {
-        loadPage(state.page + (dx > 0 ? -1 : 1));
+// ── Unified mouse / touch / pen drag and two-finger pinch ──
+const pointers = new Map();
+let pinch = null;
+let swipeStart = null;
+let usedPinch = false;
+function localPointer(e) {
+    const r = container.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+function startPinch() {
+    if (pointers.size < 2) return;
+    const [a, b] = [...pointers.values()];
+    const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2;
+    pinch = {
+        distance: Math.max(1, Math.hypot(b.x - a.x, b.y - a.y)),
+        zoom: state.zoom,
+        imageX: (midX - state.translateX) / state.zoom,
+        imageY: (midY - state.translateY) / state.zoom
+    };
+    usedPinch = true;
+}
+container.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    const p = localPointer(e);
+    pointers.set(e.pointerId, p);
+    try { container.setPointerCapture(e.pointerId); } catch (_) {}
+    container.classList.add('dragging');
+    if (pointers.size === 1) {
+        swipeStart = { ...p, t: performance.now() };
+        usedPinch = false;
+    } else {
+        startPinch();
     }
-    // Quick tap in immersive mode (handled by click)
-    touchStart = null;
 });
+container.addEventListener('pointermove', e => {
+    if (!pointers.has(e.pointerId)) return;
+    e.preventDefault();
+    const previous = pointers.get(e.pointerId);
+    const p = localPointer(e);
+    pointers.set(e.pointerId, p);
+    if (pointers.size >= 2) {
+        if (!pinch) startPinch();
+        const [a, b] = [...pointers.values()];
+        const midpointX = (a.x + b.x) / 2, midpointY = (a.y + b.y) / 2;
+        const distance = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y));
+        state.zoom = Math.max(.5, Math.min(6, pinch.zoom * distance / pinch.distance));
+        state.translateX = midpointX - pinch.imageX * state.zoom;
+        state.translateY = midpointY - pinch.imageY * state.zoom;
+        updateTransform();
+    } else {
+        pan(p.x - previous.x, p.y - previous.y);
+    }
+});
+function finishPointer(e) {
+    if (!pointers.has(e.pointerId)) return;
+    const p = localPointer(e);
+    const canSwipe = e.type === 'pointerup' && e.pointerType === 'touch' &&
+        pointers.size === 1 && !usedPinch && swipeStart &&
+        Math.abs(state.zoom - 1) < .001 &&
+        baseWidth * state.zoom <= container.clientWidth + 2;
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (!pointers.size) {
+        container.classList.remove('dragging');
+        if (canSwipe) {
+            const dx = p.x - swipeStart.x, dy = p.y - swipeStart.y;
+            if (Math.abs(dx) > 55 && Math.abs(dx) > 1.5 * Math.abs(dy)
+                && performance.now() - swipeStart.t < 500) {
+                loadPage(state.page + (dx > 0 ? -1 : 1));
+            }
+        }
+        swipeStart = null;
+        saveState();
+    } else {
+        // The remaining finger may immediately continue panning.
+        swipeStart = null;
+    }
+}
+container.addEventListener('pointerup', finishPointer);
+container.addEventListener('pointercancel', finishPointer);
+container.addEventListener('lostpointercapture', finishPointer);
 
 // ── Init ──
 renderTOC();
