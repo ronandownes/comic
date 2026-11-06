@@ -588,6 +588,8 @@ function startPinch() {
     usedPinch = true;
 }
 container.addEventListener('pointerdown', e => {
+    // Native touch events below handle fingers, with pointer events as fallback.
+    if (e.pointerType === 'touch' && 'ontouchstart' in window) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     e.preventDefault();
     const p = localPointer(e);
@@ -648,6 +650,93 @@ function finishPointer(e) {
 container.addEventListener('pointerup', finishPointer);
 container.addEventListener('pointercancel', finishPointer);
 container.addEventListener('lostpointercapture', finishPointer);
+
+// ── Explicit touchscreen support: single-finger pan and two-finger pinch ──
+// Touch Events provide dependable multi-finger tracking on Windows,
+// iOS and Android; Pointer Events remain active for mouse and pen.
+let touchLast = null;
+let touchPinch = null;
+let touchSwipe = null;
+let touchHadPinch = false;
+function touchLocal(t) {
+    const r = container.getBoundingClientRect();
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+}
+function touchPair(touches) {
+    const a = touchLocal(touches[0]), b = touchLocal(touches[1]);
+    return {
+        x: (a.x + b.x) / 2,
+        y: (a.y + b.y) / 2,
+        distance: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y))
+    };
+}
+function beginTouchPinch(touches) {
+    const center = touchPair(touches);
+    touchPinch = {
+        distance: center.distance,
+        initialZoom: state.zoom,
+        imageX: (center.x - state.translateX) / state.zoom,
+        imageY: (center.y - state.translateY) / state.zoom
+    };
+    touchHadPinch = true;
+    touchSwipe = null;
+    touchLast = null;
+}
+container.addEventListener('touchstart', e => {
+    if (e.cancelable) e.preventDefault();
+    container.classList.add('dragging');
+    if (e.touches.length >= 2) {
+        beginTouchPinch(e.touches);
+    } else if (e.touches.length === 1) {
+        touchLast = touchLocal(e.touches[0]);
+        touchSwipe = { ...touchLast, time: performance.now() };
+        touchHadPinch = false;
+        touchPinch = null;
+    }
+}, { passive: false });
+container.addEventListener('touchmove', e => {
+    if (e.cancelable) e.preventDefault();
+    if (e.touches.length >= 2) {
+        if (!touchPinch) beginTouchPinch(e.touches);
+        const center = touchPair(e.touches);
+        state.zoom = Math.max(.5, Math.min(6, touchPinch.initialZoom * center.distance / touchPinch.distance));
+        state.translateX = center.x - touchPinch.imageX * state.zoom;
+        state.translateY = center.y - touchPinch.imageY * state.zoom;
+        updateTransform();
+    } else if (e.touches.length === 1) {
+        const p = touchLocal(e.touches[0]);
+        if (touchLast) pan(p.x - touchLast.x, p.y - touchLast.y);
+        touchLast = p;
+    }
+}, { passive: false });
+function endTouch(e) {
+    if (e.cancelable) e.preventDefault();
+    if (e.touches.length >= 2) {
+        beginTouchPinch(e.touches);
+    } else if (e.touches.length === 1) {
+        touchLast = touchLocal(e.touches[0]);
+        touchPinch = null;
+    } else {
+        container.classList.remove('dragging');
+        if (e.type === 'touchend' && !touchHadPinch && touchSwipe &&
+            Math.abs(state.zoom - 1) < .001 &&
+            baseWidth * state.zoom <= container.clientWidth + 2 &&
+            e.changedTouches.length) {
+            const finish = touchLocal(e.changedTouches[0]);
+            const dx = finish.x - touchSwipe.x;
+            const dy = finish.y - touchSwipe.y;
+            if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.5 &&
+                performance.now() - touchSwipe.time < 500) {
+                loadPage(state.page + (dx > 0 ? -1 : 1));
+            }
+        }
+        touchLast = touchPinch = touchSwipe = null;
+        touchHadPinch = false;
+        saveState();
+    }
+}
+container.addEventListener('touchend', endTouch, { passive: false });
+container.addEventListener('touchcancel', endTouch, { passive: false });
 
 // ── Init ──
 renderTOC();
