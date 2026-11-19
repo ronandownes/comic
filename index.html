@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<!-- build-comic.py v3 | 2026-02-09 10:29 -->
+<!-- build-comic.py v5 | 2026-02-09 10:29 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Comic</title>
+<title>Maths Comics</title>
 <link rel="canonical" href="./comic/">
-<meta name="generator" content="build-comic.py v3">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="generator" content="build-comic.py v5">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100dvh;overflow:hidden;touch-action:pan-x pan-y}
@@ -35,6 +36,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .toc-item.active{background:#0066cc;color:#fff}
 .toc-section{padding-left:20px;color:#999;font-size:11px}
 .toc-section:hover{color:#ccc}
+.toc-search-wrap{padding:8px 10px;background:#222;border-bottom:1px solid #444}
+.toc-search{width:100%;padding:9px 10px;border:1px solid #555;border-radius:6px;background:#151515;color:#fff;font-size:13px}
+.toc-search:focus{outline:2px solid #339bea}
+.toc-book{padding:9px 10px;background:#2c3640;border-bottom:1px solid #4a5864;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700}
+.toc-book a{color:#98d5ff;font-size:11px;font-weight:500}
+.toc-start{font-style:italic}
+.toc-chapter{font-size:13px}
+.toc-section{white-space:normal;line-height:1.45}
+.toc-chapter.filter-hidden,.toc-book.filter-hidden{display:none}
+.toc-chapter.filter-hidden+.toc-sections{display:none!important}
+.toc-chapter:focus-visible,.toc-book a:focus-visible{outline:2px solid #98d5ff}
+.toc-no-results{padding:12px;font-size:12px;color:#aaa}
+.toc-no-results[hidden]{display:none}
 
 /* ── Viewer ── */
 .viewer{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
@@ -146,6 +160,7 @@ body:not(.toc-hidden) .side-nav.prev{left:310px}
     <h2>Contents</h2>
     <button class="toc-close" id="tocClose">×</button>
   </div>
+  <div class="toc-search-wrap"><input id="tocSearch" class="toc-search" type="search" placeholder="Search chapters or lessons" aria-label="Search chapters or lessons" autocomplete="off"></div>
   <div class="toc-content" id="tocContent"></div>
 </div>
 
@@ -170,7 +185,7 @@ body:not(.toc-hidden) .side-nav.prev{left:310px}
       <div class="sep"></div>
       <button id="fullscreen" title="Fullscreen (F)">⛶</button>
       <button id="copyLink" title="Copy link to page">📎</button>
-      <span class="viewer-build hide-mobile" title="Comic viewer release 2026-11-06.4">v4</span>
+      <span class="viewer-build hide-mobile" title="Comic viewer release 2026-11-19.5">v5</span>
     </div>
   </div>
   <div class="image-container fit-height" id="imageContainer">
@@ -216,6 +231,19 @@ function findChapter(ref) {
     return CONFIG.toc?.find(x => x.ref === ref);
 }
 function chRef(p) { return p.book + '-' + String(p.chapter).padStart(2,'0'); }
+const CHAPTER_INDEX = new Map((CONFIG.toc||[]).map((ch,i)=>[ch.ref,i+1]));
+function bookCode(ref) {
+    const a=ref.split('-').map(Number);
+    return String(a[0])+('ABCD'[Math.floor((a[1]-1)/3)]||'');
+}
+function safeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function goChapter(dir){
+    const p=parseRef(getRef(state.page));
+    if(!p)return;
+    const i=CONFIG.toc.findIndex(ch=>ch.ref===chRef(p));
+    const next=CONFIG.toc[i+dir];
+    if(i>=0&&next&&CONFIG.pageMap[next.toc]!==undefined)loadPage(CONFIG.pageMap[next.toc]);
+}
 
 // ── Load page ──
 function loadPage(idx) {
@@ -241,7 +269,8 @@ function updateBreadcrumb() {
     if (!p) { bc.innerHTML = ''; cp.textContent = state.page + 1; pt.textContent = '/ ' + CONFIG.pages.length; return; }
 
     const chapter = findChapter(chRef(p));
-    const chLabel = chapter ? 'Ch' + p.chapter + ': ' + chapter.name : 'Ch ' + p.chapter;
+    const continuousNumber=CHAPTER_INDEX.get(chRef(p))||p.chapter;
+    const chLabel='Ch '+String(continuousNumber).padStart(2,'0')+': '+(chapter?safeHTML(chapter.name):'');
     const pageLabel = p.page === 1 ? 'Contents' : 'p.' + p.page;
 
     // Count pages in this chapter
@@ -249,7 +278,7 @@ function updateBreadcrumb() {
     const chPages = CONFIG.pages.filter(pg => pg.includes(chPrefix)).length;
 
     bc.innerHTML =
-        `<span data-nav="chapter" data-ref="${chRef(p)}">${chLabel}</span>`;
+        `<span data-nav="chapter" data-ref="${chRef(p)}">Book ${bookCode(chRef(p))} · ${chLabel}</span>`;
 
     cp.textContent = pageLabel;
     pt.textContent = '/ ' + chPages;
@@ -374,51 +403,58 @@ function toggleTOC(show) {
 }
 
 function renderTOC() {
-    const content = $('tocContent');
-    if (!CONFIG.toc?.length) {
-        let html = '';
-        for (let i = 0; i < CONFIG.pages.length; i += 20) {
-            html += `<div class="toc-item" data-idx="${i}">Pages ${i+1}–${Math.min(i+20, CONFIG.pages.length)}</div>`;
-        }
-        content.innerHTML = html;
-        content.querySelectorAll('.toc-item').forEach(el => {
-            el.onclick = () => { loadPage(+el.dataset.idx); toggleTOC(false); };
-        });
+    const content=$('tocContent');
+    if(!CONFIG.toc?.length){
+        content.innerHTML='<div class="toc-item">No chapter index available.</div>';
         return;
     }
-
-    let html = '';
-    CONFIG.toc.forEach(ch => {
-        const chIdx = CONFIG.pageMap[ch.toc] ?? 0;
-        html += `<div class="toc-chapter" data-ref="${ch.ref}" data-idx="${chIdx}">${ch.ref.replace(/^\d+-/,'')}. ${ch.name}</div>`;
-        html += `<div class="toc-sections" data-ref="${ch.ref}">`;
-        (ch.sections || []).forEach(s => {
-            const sIdx = CONFIG.pageMap[s.page];
-            html += `<div class="toc-item toc-section" data-idx="${sIdx ?? 0}" data-ref="${ch.ref}">${s.name}</div>`;
+    let html='',prevBook='';
+    CONFIG.toc.forEach((ch,i)=>{
+        const book=bookCode(ch.ref),first=CONFIG.pageMap[ch.toc]??0;
+        if(book!==prevBook){
+            html+='<div class="toc-book" data-book="'+book+'"><span>Beast Academy '+book+'</span><a href="https://beastacademy.com/books/'+book+'" target="_blank" rel="noopener noreferrer" title="Original book cover">Cover ↗</a></div>';
+            prevBook=book;
+        }
+        html+='<div class="toc-chapter" role="button" tabindex="0" aria-expanded="false" data-book="'+book+'" data-ref="'+ch.ref+'" data-idx="'+first+'">'+String(i+1).padStart(2,'0')+'. '+safeHTML(ch.name)+'</div>';
+        html+='<div class="toc-sections" data-ref="'+ch.ref+'">';
+        html+='<div class="toc-item toc-section toc-start" data-idx="'+first+'" data-ref="'+ch.ref+'">Start of chapter</div>';
+        (ch.sections||[]).forEach(sec=>{
+            const page=CONFIG.pageMap[sec.page];
+            if(page!==undefined)html+='<div class="toc-item toc-section" data-idx="'+page+'" data-ref="'+ch.ref+'">'+safeHTML(sec.name)+'</div>';
         });
-        html += `</div>`;
+        html+='</div>';
     });
-    content.innerHTML = html;
-
-    // Chapter toggle (click heading → expand/collapse, also navigate)
-    content.querySelectorAll('.toc-chapter').forEach(el => {
-        el.onclick = () => {
-            const wasOpen = el.classList.contains('open');
-            if (!wasOpen) {
-                // Close all, open this one
-                content.querySelectorAll('.toc-chapter').forEach(x => x.classList.remove('open'));
-                el.classList.add('open');
-            } else {
-                el.classList.toggle('open');
-            }
-            loadPage(+el.dataset.idx);
-            toggleTOC(false);
-        };
+    html+='<div class="toc-no-results" id="tocNoResults" hidden>No matching chapters or lessons.</div>';
+    content.innerHTML=html;
+    function toggle(el){
+        const open=el.classList.contains('open');
+        content.querySelectorAll('.toc-chapter').forEach(x=>{x.classList.remove('open');x.setAttribute('aria-expanded','false')});
+        if(!open){el.classList.add('open');el.setAttribute('aria-expanded','true')}
+    }
+    content.querySelectorAll('.toc-chapter').forEach(el=>{
+        el.onclick=()=>toggle(el);
+        el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle(el)}};
     });
-    // Section click → navigate
-    content.querySelectorAll('.toc-section').forEach(el => {
-        el.onclick = e => { e.stopPropagation(); loadPage(+el.dataset.idx); toggleTOC(false); };
+    content.querySelectorAll('.toc-section').forEach(el=>{
+        el.onclick=e=>{e.stopPropagation();loadPage(+el.dataset.idx);toggleTOC(false)};
     });
+}
+function filterTOC(){
+    const q=$('tocSearch').value.trim().toLowerCase();
+    let count=0;
+    document.querySelectorAll('.toc-chapter').forEach(el=>{
+        const full=(el.textContent+' '+el.nextElementSibling.textContent).toLowerCase();
+        const visible=!q||full.includes(q)||el.dataset.book.toLowerCase().includes(q);
+        el.classList.toggle('filter-hidden',!visible);
+        if(visible)count++;
+        if(q){el.classList.toggle('open',visible);el.setAttribute('aria-expanded',String(visible))}
+    });
+    document.querySelectorAll('.toc-book').forEach(el=>{
+        const visible=[...document.querySelectorAll('.toc-chapter')].some(ch=>ch.dataset.book===el.dataset.book&&!ch.classList.contains('filter-hidden'));
+        el.classList.toggle('filter-hidden',!visible);
+    });
+    $('tocNoResults').hidden=count>0;
+    if(!q)updateTOCHighlight();
 }
 
 function updateTOCHighlight() {
@@ -577,6 +613,8 @@ document.addEventListener('keydown', e => {
     else if (k === 'End') loadPage(CONFIG.pages.length - 1);
     else if (k === 'h' || k === 'H') setFitMode('height');
     else if (k === 'w' || k === 'W') setFitMode('width');
+    else if (k === '[') goChapter(-1);
+    else if (k === ']') goChapter(1);
     else if (k === 't' || k === 'T') toggleTOC();
     else if (k === 'f' || k === 'F') toggleFullscreen();
     else if (k === 'Escape') { if (isCleanMode()) { document.body.classList.remove('clean-mode','show-ui'); } }
@@ -784,6 +822,7 @@ container.addEventListener('touchcancel', endTouch, { passive: false });
 
 // ── Init ──
 renderTOC();
+$('tocSearch').addEventListener('input', filterTOC);
 setFitMode(state.fitMode);
 const hash = location.hash.match(/#page=(\d+)/);
 if (hash) state.page = parseInt(hash[1]) - 1;
